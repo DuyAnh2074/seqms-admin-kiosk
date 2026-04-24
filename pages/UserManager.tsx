@@ -114,13 +114,19 @@ const UserManager: React.FC = () => {
     setToasts(prev => prev.filter(t => t.id !== id));
   };
 
-  // Load data on mount
+  // Load users only for list view
   useEffect(() => {
-    loadProvinces();
     if (viewMode === 'list') {
       loadUsersList();
     }
   }, [viewMode]);
+
+  // Load location data only when opening add/edit form
+  useEffect(() => {
+    if (viewMode !== 'list' && provinces.length === 0) {
+      loadProvinces();
+    }
+  }, [viewMode, provinces.length]);
 
   // Load districts when province changes
   useEffect(() => {
