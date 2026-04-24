@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    .container .content h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: "Times New Roman", Times, serif !important;
+      color: black !important;
+      margin-bottom: 0;
+      font-weight: 600;
+      line-height: normal;
+    }
+
+    .container p {
+      margin-bottom: 0 !important;
+    }
+
+    .info>.name {
+      font-size: 16px;
+      line-height: 18px !important;
+    }
+
+    .container {
+      font-family: "Times New Roman", Times, serif !important;
+      width: 794px;
+      height: 1123px;
+      margin: 25px auto;
+      background-color: #fff;
+      padding: 75.590560704px 56.692920528px 75.590560704px 113.38584106px;
+      line-height: normal !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    .heading {
+      text-align: center;
+    }
+
+    .title {
+      text-align: center;
+      margin: 26px 0 32px;
+    }
+
+    .avatar {
+      margin-left: 10px;
+      width: 148px;
+      height: 195px;
+      float: right;
+      border: 1px solid #000;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .info-all::after {
+      display: block;
+      content: "";
+      clear: both;
+    }
+
+    .info {
+      display: flex;
+      margin-top: 8px;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .name {
+      align-items: center;
+    }
+
+    .info .right {
+      display: flex;
+      flex-direction: column;
+      width: 90%;
+      align-items: start;
+      flex: 1;
+      font-size: 16px !important;
+      line-height: 19px !important;
+    }
+
+    .tt {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      border-bottom: 1px dotted black;
+      overflow: hidden;
+    }
+
+    .tt-1 {
+      margin-top: 27px;
+    }
+
+    .confirm {
+      margin-top: 14px;
+      font-size: 16px;
+      text-align: justify;
+    }
+
+    .date {
+      margin-top: 18px;
+      text-align: end;
+      margin-right: 20px;
+      font-style: italic;
+    }
+
+    .date div {
+      display: inline-block;
+      font-size: 16px;
+      /* border-bottom: 1px dotted black; */
+      line-height: 15px;
+    }
+
+    .date i {
+      font-size: 16px;
+    }
+
+    .pledge {
+      margin-top: 60px;
+    }
+
+    .pledge-title,
+    .signature-title {
+      font-size: 16px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .pledge-content {
+      font-size: 16px;
+      text-align: justify;
+    }
+
+    .attention {
+      font-style: italic;
+      text-align: center;
+    }
+
+    .line-dot {
+      margin-top: 9px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="content">
+      <div class="heading">
+        <h3>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h3>
+        <h4>Độc lập - Tự do - Hạnh phúc</h4>
+      </div>
+
+      <div class="title">
+        <h2>DỮ LIỆU THÔNG TIN CÔNG DÂN</h2>
+      </div>
+
+      <div class="content-info">
+        <div class="info-all">
+          <div class="avatar">
+            <img src="data:image/jpeg;base64,{{AVATAR}}" alt="" />
+          </div>
+          <!-- het avatar  -->
+          <div class="list-info">
+            <div class="info">
+              <div class="name">Họ và tên: {{FULL_NAME}}</div>
+              <!-- <div class="right">
+                <p class="tt"></p>
+              </div> -->
+            </div>
+            <div class="info">
+              <div class="name">Ngày sinh: {{DATE_OF_BIRTH}}</div>
+              <!-- <div class="right">
+                <p class="tt"></p>
+              </div> -->
+            </div>
+            <div class="info">
+              <div class="name">Số CCCD: {{NATION_NO}}</div>
+              <!-- <div class="right">
+                <p class="tt"></p>
+              </div> -->
+            </div>
+            <div class="info">
+              <div class="name">Ngày cấp: {{DATE_OF_ISSUE}}</div>
+              <!-- <div class="right">
+                <p class="tt"></p>
+              </div> -->
+            </div>
+            <div class="info">
+              <div class="name">Ngày hết hạn: {{EXPIRED_DATE}}</div>
+              <!-- <div class="right">
+                <p class="tt"></p>
+              </div> -->
+            </div>
+            <div class="info">
+              <div class="name">Số CMND:</div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="name">Địa chỉ thường trú: {{ADDRESS}}</div>
+              <!-- <div class="right">
+                <p class="tt"></p>
+              </div> -->
+            </div>
+
+            <!-- <div class="line-dot">
+              <div style="height: 18px;"></div>
+              <div class="tt tt-1" style="margin-top: 0;"></div>
+            </div> -->
+
+            <div class="info">
+              <div class="name">Quê quán: {{PLACE_OF_ORIGIN}}</div>
+              <!-- <div class="right">
+                <p class="tt"></p>
+              </div> -->
+            </div>
+            <!-- <div class="line-dot">
+              <p class="tt" style="height: 18px"></p>
+            </div> -->
+
+            <div class="info">
+              <div class="name">Nhận dạng: {{PERSONAL_IDENTIFICATION}}</div>
+              <!-- <div class="right">
+                <p class="tt"></p>
+              </div> -->
+            </div>
+
+            <div class="info">
+              <div class="name">Giới tính: {{SEX}}</div>
+              <!-- <div class="right">
+                <p class="tt"></p>
+              </div> -->
+            </div>
+            <div class="info">
+              <div class="name">Quốc tịch: {{NATION}}</div>
+              <!-- <div class="right">
+                <p class="tt"></p>
+              </div> -->
+            </div>
+
+            <div class="info">
+              <div class="name">Dân tộc: {{ETHNICITY}}</div>
+              <!-- <div class="right">
+                <p class="tt"></p>
+              </div> -->
+            </div>
+
+            <div class="info">
+              <div class="name">Tôn giáo: {{RELIGION}}</div>
+              <!-- <div class="right">
+                <p class="tt"></p>
+              </div> -->
+            </div>
+
+            <div class="info">
+              <div class="name">Họ và tên cha: {{FATHER_NAME}}</div>
+              <!-- <div class="right">
+                <p class="tt"></p>
+              </div> -->
+            </div>
+
+            <div class="info">
+              <div class="name">Họ và tên mẹ: {{MOTHER_NAME}}</div>
+              <!-- <div class="right">
+                <p class="tt"></p>
+              </div> -->
+            </div>
+
+            <div class="info">
+              <div class="name">Họ và tên Vợ/Chồng:</div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+            </div>
+          </div>
+          <!-- het div list-info  -->
+        </div>
+        <!-- het info-all  -->
+      </div>
+      <!-- het khoi content-info  -->
+
+
+      <div class="confirm">
+        <b>Đã đối chiếu dữ liệu: </b>Các thông tin dữ liệu khai thác từ thiết
+        bị đọc chíp thẻ CCCD đã được C06 kiểm chứng bảo đảm tính xác thực.
+      </div>
+
+
+      <div class="date">
+        <div>......</div>
+        <i> giờ </i>
+        <div>.....</div>
+        <i> phút, ngày </i>
+        <div>.....</div>
+        <i> tháng </i>
+        <div>.....</div>
+        <i> năm </i>
+        <div>.........</div>
+      </div>
+
+
+      <div class="pledge">
+        <div class="pledge-title">
+          LỜI CAM ĐOAN CỦA NGƯỜI YÊU CẦU CÔNG CHỨNG
+        </div>
+        <div class="pledge-content">
+          TÔI ĐÃ KIỂM TRA VÀ XIN CAM ĐOAN NHỮNG THÔNG TIN DỮ LIỆU ĐƯỢC KHAI
+          THÁC TỪ THẺ CĂN CƯỚC CÔNG DÂN CỦA TÔI LÀ ĐÚNG SỰ THẬT. CAM KẾT NÀY
+          HOÀN TOÀN TỰ NGUYỆN, KHÔNG BỊ LỪA DỐI, ÉP BUỘC. NẾU CÓ GIAN DỐI, MAN
+          SAI, TÔI HOÀN TOÀN CHỊU TRÁCH NHIỆM TRƯỚC PHÁP LUẬT.
+        </div>
+      </div>
+
+      <div class="signature">
+        <div class="signature-title">Người yêu cầu công chứng</div>
+        <div class="attention">(Kí và ghi rõ họ, tên)</div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Document</title>
+
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box !important;
+    }
+
+    .container .content h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: "Times New Roman", Times, serif !important;
+      color: black !important;
+      margin-bottom: 0;
+      font-weight: 600;
+      line-height: normal;
+    }
+
+    h3 {
+      font-size: 18.72px !important;
+    }
+
+    h4 {
+      font-size: 16px !important;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+
+    .text-indent {
+      text-indent: 20px;
+    }
+
+    .container p {
+      margin-bottom: 0 !important;
+    }
+
+    .info>.name {
+      font-size: 16px;
+      line-height: 18px !important;
+    }
+
+    .container {
+      font-family: "Times New Roman", Times, serif !important;
+      width: 794px;
+      /* height: 1123px; */
+      margin: auto;
+      background-color: #fff;
+      padding: 50.590560704px 56.692920528px 75.590560704px 113.38584106px;
+      line-height: normal !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    .heading {
+      text-align: center;
+    }
+
+    .title {
+      text-align: center;
+      margin: 26px 0 18px;
+    }
+
+    .avatar {
+      margin-left: 10px;
+      width: 148px;
+      height: 195px;
+      float: right;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .info-all::after {
+      display: block;
+      content: "";
+      clear: both;
+    }
+
+    .info {
+      display: flex;
+      margin-top: 8px;
+      gap: 4px;
+      align-items: flex-end;
+    }
+
+    .name {
+      align-items: center;
+    }
+
+    .info .right {
+      display: flex;
+      flex-direction: column;
+      width: 90%;
+      align-items: start;
+      flex: 1;
+      font-size: 16px !important;
+      line-height: 19px !important;
+    }
+
+    .tt {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      border-bottom: 1px dotted black;
+      overflow: hidden;
+      position: relative;
+      top: -2px;
+    }
+
+    .confirm {
+      margin-top: 14px;
+      font-size: 16px;
+      text-align: justify;
+    }
+
+    .date {
+      margin-top: 18px;
+      text-align: end;
+      margin-right: 20px;
+      font-style: italic;
+    }
+
+    .date div {
+      display: inline-block;
+      font-size: 16px;
+      border-bottom: 1px dotted black;
+      line-height: 15px;
+    }
+
+    .date i {
+      font-size: 16px;
+    }
+
+    .signature {
+      text-align: center;
+      position: relative;
+      right: -160px;
+    }
+
+    .signature-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .pledge-content {
+      font-size: 16px;
+      text-align: justify;
+    }
+
+    .attention {
+      font-style: italic;
+    }
+
+    .line-dot {
+      margin-top: 9px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="content">
+      <div class="heading">
+        <h3>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h3>
+        <h4 style="border-bottom: 1px solid; width: 258px; margin: auto">
+          Độc lập - Tự do - Hạnh phúc
+        </h4>
+      </div>
+
+      <div class="title">
+        <h3>TỜ KHAI ĐĂNG KÝ KHAI SINH</h3>
+      </div>
+
+      <div class="dear" style="margin: 0px auto 18px; width: 446px">
+        <div class="info">
+          <div class="name">
+            Kính gửi:
+            <span style="
+                  position: relative;
+                  top: -4px;
+                  font-size: 10px;
+                  margin-top: 0;
+                ">(1)</span>
+          </div>
+          <div class="right">
+            <p class="tt"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-info">
+        <div class="info-all">
+          <!-- het avatar  -->
+          <div class="list-info">
+            <div class="info">
+              <div class="name bold">Họ, chữ đệm, tên người yêu cầu: {{FULL_NAME}}</div>
+              <!-- <div class="right">
+                <p class="tt"></p>
+              </div> -->
+            </div>
+            <!-- <div class="line-dot">
+              <p class="tt" style="height: 18px"></p>
+            </div> -->
+
+            <div class="info">
+              <div class="name">
+                Nơi cư trú:
+                <span style="
+                      position: relative;
+                      top: -4px;
+                      font-size: 10px;
+                      margin-top: 0;
+                    ">(2)</span>
+                {{ADDRESS}}
+              </div>
+              <!-- <div class="right">
+                <p class="tt"></p>
+              </div> -->
+            </div>
+            <!-- <div class="info" style="display: block;">
+                <div class="line-dot">
+                  <p class="tt" style="height: 18px"></p>
+                </div>
+              </div> -->
+            <!-- <div class="line-dot">
+              <p class="tt" style="height: 18px"></p>
+            </div> -->
+
+            <div class="info">
+              <div class="name">
+                Giấy tờ tùy thân:
+                <span style="
+                      position: relative;
+                      top: -4px;
+                      font-size: 10px;
+                      margin-top: 0;
+                    ">(3) </span>
+                {{NATION_NO}}
+              </div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+            </div>
+            <div class="line-dot">
+              <p class="tt" style="height: 18px"></p>
+            </div>
+
+            <div class="info">
+              <div class="name">Quan hệ với người được khai sinh:</div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="name bold" style="margin-top: 8px">
+                Đề nghị cơ quan đăng ký khai sinh cho người dưới đây:
+              </div>
+            </div>
+            <div class="info">
+              <div class="name bold">Họ, chữ đệm, tên:</div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="name">Ngày, tháng, năm sinh:</div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+              <div class="name">Ghi bằng chữ:</div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+            </div>
+            <div class="line-dot">
+              <p class="tt" style="height: 18px"></p>
+            </div>
+
+            <div class="info">
+              <div class="name">Giới tính:</div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+              <div class="name">Dân tộc:</div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+              <div class="name">Quốc tịch:</div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="name">
+                Nơi sinh:
+                <span style="
+                      position: relative;
+                      top: -4px;
+                      font-size: 10px;
+                      margin-top: 0;
+                    ">(4)</span>
+              </div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+            </div>
+            <div class="line-dot">
+              <p class="tt" style="height: 18px"></p>
+            </div>
+
+            <div class="info">
+              <div class="name">Quê quán:</div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="name bold">Họ, chữ đệm, tên người mẹ:</div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="name">
+                Năm sinh:
+                <span style="
+                      position: relative;
+                      top: -4px;
+                      font-size: 10px;
+                      margin-top: 0;
+                    ">(5)</span>
+              </div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+              <div class="name">Dân tộc:</div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+              <div class="name">Quốc tịch:</div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="name">
+                Nơi cư trú:
+                <span style="
+                      position: relative;
+                      top: -4px;
+                      font-size: 10px;
+                      margin-top: 0;
+                    ">(2)</span>
+              </div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+            </div>
+            <div class="line-dot">
+              <p class="tt" style="height: 18px"></p>
+            </div>
+
+            <div class="info">
+              <div class="name bold">Họ, chữ đệm, tên người bố:</div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="name">
+                Năm sinh:
+                <span style="
+                      position: relative;
+                      top: -4px;
+                      font-size: 10px;
+                      margin-top: 0;
+                    ">(5)</span>
+              </div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+              <div class="name">Dân tộc:</div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+              <div class="name">Quốc tịch:</div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="name">
+                Nơi cư trú:
+                <span style="
+                      position: relative;
+                      top: -4px;
+                      font-size: 10px;
+                      margin-top: 0;
+                    ">(2)</span>
+              </div>
+              <div class="right">
+                <p class="tt"></p>
+              </div>
+            </div>
+            <div class="line-dot">
+              <p class="tt" style="height: 18px"></p>
+            </div>
+          </div>
+          <!-- het div list-info  -->
+        </div>
+        <!-- het info-all  -->
+      </div>
+      <!-- het khoi content-info  -->
+
+      <div class="confirm">
+        <p>
+          Tôi cam đoan nội dung đề nghị đăng ký khai sinh trên đây là đúng sự
+          thật, được sự thỏa thuận nhất trí của các bên liên quan theo quy
+          định pháp luật.
+        </p>
+        <p style="margin: 8px 0">
+          Tôi chịu hoàn toàn trách nhiệm trước pháp luật về nội dung cam đoan
+          của mình.
+        </p>
+      </div>
+
+      <div class="date">
+        <i> Làm tại: </i>
+        <div style="width: 100px"></div>
+        <i>, ngày </i>
+        <div style="width: 30px">
+
+        </div>
+        <i> tháng </i>
+        <div style="width: 30px">
+
+        </div>
+        <i> năm </i>
+        <div style="width: 30px">
+
+        </div>
+      </div>
+
+      <div class="signature">
+        <div style="margin-right: 0">
+          <div class="signature-title">Người yêu cầu</div>
+          <div class="attention">(Kí và ghi rõ họ, chữ đệm, tên)</div>
+          <!-- <p
+              class="tt"
+              style="
+                position: relative;
+                top: 60px;
+                left: 248px;
+                width: 130px;
+                position: relative;
+                top: 72px;
+                left: 248px;
+              "
+            ></p> -->
+        </div>
+      </div>
+
+      <div class="check" style="margin-top: 44px; width: 50%">
+        <div style="border-bottom: 3px double #000"></div>
+        <div class="">
+          Đề nghị cấp bản sao
+          <span style="
+                position: relative;
+                top: -4px;
+                font-size: 10px;
+                margin-top: 0;
+              ">(6)</span>
+          :
+          <div class="yes" style="display: inline-block">
+            Có <input type="checkbox" name="yes" value="yes" />
+          </div>
+          <div class="no" style="display: inline-block">
+            , Không <input type="checkbox" name="no" value="no" />
+          </div>
+
+          <div class="quantity">
+            Số lượng:
+            <span style="
+                  display: inline-block;
+                  width: 40px;
+                  border-bottom: 1px dotted black;
+                "></span>
+            bản
+          </div>
+        </div>
+      </div>
+
+      <div class="notes" style="margin-top: 40px">
+        <i class="bold" style="text-decoration: underline">Chú thích:</i>
+
+        <div class="note-list" style="text-align: justify">
+          <div class="text-indent">
+            <span style="
+                  position: relative;
+                  top: -4px;
+                  font-size: 10px;
+                  margin-top: 0;
+                ">(1)</span>
+            Ghi rõ tên cơ quan đăng ký khai sinh.
+          </div>
+
+          <div class="text-indent">
+            <span style="
+                  position: relative;
+                  top: -4px;
+                  font-size: 10px;
+                  margin-top: 0;
+                ">(2)</span>
+            Ghi theo nơi đăng ký thường trú; nếu không có nơi đăng ký thường
+            trú thì ghi theo nơi đăng ký tạm trú; trường hợp không có nơi đăng
+            ký thường trú và nơi đăng ký tạm trú thì ghi theo nơi đang sinh
+            sống.
+          </div>
+
+          <div class="text-indent">
+            <span style="
+                  position: relative;
+                  top: -4px;
+                  font-size: 10px;
+                  margin-top: 0;
+                ">(3)</span>
+            Ghi thông tin về giấy tờ tùy thân của người đi đăng ký, ghi rõ số,
+            cơ quan cấp, ngày cấp hộ chiếu, chứng minh nhân dân hoặc giấy tờ
+            hợp lệ thay thế (Ví dụ: Chứng minh nhân dân số 001089123 do Công
+            an thành phố Hà Nội cấp ngày 20/10/2014).
+          </div>
+
+          <div class="text-indent">
+            <span style="
+                  position: relative;
+                  top: -4px;
+                  font-size: 10px;
+                  margin-top: 0;
+                ">(4)</span>
+            Trường hợp sinh tại cơ sở y tế thì ghi rõ tên cơ sở y tế và và địa
+            chỉ trụ sở cơ sở y tế đó.
+          </div>
+
+          <div class="text-indent">
+            Ví dụ: - Bệnh viện Phụ sản Hà Nội, đường La Thành, phường Ngọc
+            Khánh, quận Ba Đình, Hà Nội
+          </div>
+
+          <div class="text-indent" style="margin-left: 44px">
+            - Trạm y tế xã Đình Bảng, huyện Từ Sơn, tỉnh Bắc Ninh.
+          </div>
+
+          <div class="text-indent">
+            Trường hợp sinh ra ngoài cơ sở y tế thì ghi địa danh của 03 cấp
+            hành chính (xã, huyện, tỉnh), nơi sinh ra.
+          </div>
+
+          <div class="text-indent">
+            Ví dụ: xã Đình Bảng, huyện Từ Sơn, tỉnh Bắc Ninh.
+          </div>
+
+          <div class="text-indent">
+            <span style="
+                  position: relative;
+                  top: -4px;
+                  font-size: 10px;
+                  margin-top: 0;
+                ">(5)</span>
+            Ghi đầy đủ ngày, tháng sinh của cha, mẹ (nếu có).
+          </div>
+
+          <div class="text-indent">
+            <span style="
+                  position: relative;
+                  top: -4px;
+                  font-size: 10px;
+                  margin-top: 0;
+                ">(6)</span>
+            Đề nghị đánh dấu X vào ô nếu có yêu cầu cấp bản sao và ghi rõ số
+            lượng..
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

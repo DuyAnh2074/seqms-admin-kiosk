@@ -1,0 +1,5 @@
+{
+  "name": "SEQMS Admin Kiosk",
+  "description": "Comprehensive admin dashboard for kiosk management, services, PGD, and reporting.",
+  "requestFramePermissions": []
+}

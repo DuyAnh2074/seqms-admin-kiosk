@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giấy đề nghị đăng ký hộ kinh doanh</title>
+    <style>
+        /* Custom checkbox with X */
+        /* Custom Checkbox for Primary Industry - Large Hit Area */
+        /* 1. Ô chứa (TD) */
+        .industry-primary-cell {
+            position: relative !important;
+            /* Làm mốc tọa độ */
+            padding: 0 !important;
+            /* Xóa đệm để input tràn viền */
+            vertical-align: middle;
+            height: 1px;
+        }
+
+        /* 2. Input Checkbox (Lớp phủ vô hình) */
+        .industry-primary-checkbox {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            opacity: 0;
+            /* Ẩn hoàn toàn */
+            z-index: 2;
+            /* Nổi lên trên cùng để nhận click */
+            cursor: pointer;
+            border: none;
+            outline: none !important;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        /* 3. Dấu X (Vẽ bằng CSS ::after của ô TD) */
+        .industry-primary-cell::after {
+            content: 'X';
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14pt;
+            /* To hơn chút cho rõ */
+            color: #000;
+
+            /* Căn giữa tuyệt đối */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            /* Căn chính giữa tâm */
+
+            z-index: 1;
+            /* Nằm dưới lớp input */
+            display: none;
+            /* Mặc định ẩn */
+            pointer-events: none;
+            /* Không chặn click */
+            line-height: 1;
+        }
+
+        /* Khi ô có class 'checked' thì hiện dấu X */
+        .industry-primary-cell.checked::after {
+            display: block;
+        }
+
+        /* Hiệu ứng hover nhẹ để biết ô có thể bấm */
+        .industry-primary-cell:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+
+        /* Original custom checkbox - keep for other uses */
+        .custom-x-checkbox {
+            position: relative;
+            width: 18px;
+            height: 18px;
+            appearance: none;
+            -webkit-appearance: none;
+            border: 1.5px solid #222;
+            border-radius: 2px;
+            background: #fff;
+            cursor: pointer;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        .custom-x-checkbox:checked::after {
+            content: 'X';
+            position: absolute;
+            left: 2px;
+            top: -2px;
+            font-size: 20px;
+            color: #222;
+            font-family: 'Times New Roman', Times, serif;
+            font-weight: normal;
+            pointer-events: none;
+        }
+
+        @page {
+            size: A4;
+
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-color: white;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 800px;
+            max-width: 210mm;
+            margin: 0 auto;
+            background-color: white;
+            padding: 70px 25px;
+            /* Padding trên/dưới */
+            box-shadow: none;
+
+            /* TẠO FLEXBOX ĐỂ CĂN FOOTER */
+            display: flex;
+            flex-direction: column;
+            /* Chiều cao tối thiểu bằng 1 trang A4 trừ đi padding (297mm - 70mm padding) */
+            /* Để đảm bảo nếu nội dung ngắn, footer vẫn nằm đáy */
+            min-height: 230mm;
+        }
+
+        /* Hide print address groups in input view */
+        .print_address_group {
+            display: none;
+        }
+
+        /* Print-only text styling */
+        .address-text-display {
+            border-bottom: 1px dotted #000;
+            padding: 5px 0;
+            min-width: 200px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14pt;
+            line-height: 19px;
+            display: inline-block;
+            vertical-align: baseline;
+            flex: 1;
+        }
+
+        /* Required field mark styling */
+        .required-mark {
+            color: red;
+            font-weight: bold;
+            margin-left: 2px;
+            display: inline;
+        }
+
+        /* Hide required marks when printing */
+        @media print {
+            .required-mark {
+                display: none !important;
+            }
+
+            .instruction-text {
+                display: none !important;
+            }
+
+            .input-line {
+                border-bottom: none !important;
+            }
+
+            .address-text-display {
+                border-bottom: none !important;
+            }
+
+            .tt {
+                border-bottom: none !important;
+            }
+
+            .cascading-select {
+                border-bottom: none !important;
+            }
+        }
+
+        /* Add row button styling */
+        .add-row-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background-color 0.2s;
+            position: absolute;
+            left: -45px;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .add-row-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .add-row-btn:active {
+            background-color: #003d82;
+        }
+
+        /* Delete row button styling */
+        .delete-row-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background-color 0.2s;
+            position: absolute;
+            left: -90px;
+            bottom: 0px;
+            z-index: 10;
+        }
+
+        .delete-row-btn.visible {
+            display: flex;
+        }
+
+        .delete-row-btn:hover {
+            background-color: #c82333;
+        }
+
+        .delete-row-btn:active {
+            background-color: #a71d2a;
+        }
+
+        /* Hide add-row button when printing */
+        @media print {
+
+            .add-row-btn,
+            .delete-row-btn {
+                display: none !important;
+            }
+        }
+
+        /* Container for table and add button */
+        .table-with-add-btn {
+            display: block;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .table-with-add-btn table {
+            margin: 0;
+
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 13pt;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .header h2 {
+            font-size: 13pt;
+            font-weight: normal;
+            text-decoration: underline;
+            text-underline-offset: 6px;
+        }
+
+        .date-line {
+            text-align: right;
+            font-style: italic;
+            margin-bottom: 30px;
+            font-size: 13pt;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        .section {
+            margin-left: 20px;
+            margin-bottom: 10px;
+            font-size: 14pt;
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            margin-left: 17px;
+        }
+
+        .indent {
+            margin-left: 70px;
+        }
+
+        .input-line {
+            border: none;
+            border-bottom: 1px dotted #000;
+            outline: none;
+            background: transparent;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14pt;
+            width: 170px;
+            min-height: 24px;
+            padding: 2px 0;
+        }
+
+        /* Lined textarea - Paper lines effect */
+        .lined-textarea {
+            border: none;
+            outline: none;
+            background-position: 0 10px;
+            background-repeat: repeat;
+            background-color: transparent;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14pt;
+            padding: 10px 0 0 0;
+            line-height: 27px;
+            resize: none;
+            overflow: hidden;
+        }
+
+        table .input-line {
+            border-bottom: none !important;
+        }
+
+        /* Textarea for table cells */
+        table textarea {
+            border: 1px solid #000;
+            outline: none;
+            background: transparent;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14pt;
+            width: 100%;
+            min-height: 24px;
+            padding: 4px;
+            color: #000;
+            resize: none;
+            line-height: 1.3;
+        }
+
+        /* Auto-expand textarea in table cells */
+        table textarea.auto-expand {
+            line-height: 1.3;
+            padding-bottom: 2px;
+            overflow: visible;
+        }
+
+        .input-line.input-short {
+            width: 40px;
+            min-width: 0;
+            max-width: 40px;
+        }
+
+        .input-line.input-mid {
+            width: 120px;
+            min-width: 0;
+            max-width: 120px;
+        }
+
+        .input-medium {
+            min-width: 140px;
+        }
+
+        .input-long {
+            min-width: 300px;
+        }
+
+        .input-full {
+            width: calc(100% - 10px);
+        }
+
+        .right {
+            display: flex;
+            flex-direction: column;
+            width: 90%;
+            align-items: start;
+            flex: 1;
+            font-size: 14pt;
+            line-height: 19px;
+        }
+
+        .tt {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            border-bottom: 1px dotted black;
+            overflow: hidden;
+            position: relative;
+            top: -2px;
+            min-height: 20px;
+        }
+
+        .checkbox-group {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 30px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+        }
+
+        table {
+            width: 100%;
+            max-width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 14pt;
+            table-layout: fixed;
+            word-break: break-word;
+            white-space: normal;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #000;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            font-weight: bold;
+        }
+
+        .table-note {
+            font-size: 11px;
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        .commitment {
+            margin-top: 20px;
+            font-size: 14pt;
+            margin-left: 50px;
+            text-align: justify;
+        }
+
+        .signature-section {
+            text-align: right;
+            margin-top: 40px;
+            margin-right: 100px;
+            font-weight: bold;
+            font-size: 13pt;
+            page-break-inside: avoid;
+        }
+
+        .footnotes {
+            /* Style cũ giữ nguyên */
+            font-size: 10pt;
+            line-height: 1.5;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+
+            /* Đảm bảo không bị ngắt trang giữa chừng */
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        .footnote {
+            margin-bottom: 5px;
+        }
+
+        .italic {
+            font-style: italic;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .underline {
+            text-decoration: underline;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .nowrap {
+            white-space: nowrap;
+        }
+
+        .add-button {
+            width: 25px;
+            height: 25px;
+            border: 1px solid #000;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* TreeSelect Popup Styles */
+        .tree-select-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .tree-select-input {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .tree-select-popup {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            max-height: 400px;
+            overflow-y: auto;
+            overflow-x: auto;
+            margin-top: 4px;
+            min-width: 700px;
+            max-width: 900px;
+        }
+
+        .tree-select-popup.hidden {
+            display: none;
+        }
+
+        .tree-node {
+            padding: 8px 12px;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14pt;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 4px;
+        }
+
+        .tree-node:hover {
+            background-color: #f0f0f0;
+        }
+
+        .tree-node.disabled {
+            color: black;
+            cursor: pointer;
+        }
+
+        .tree-node.disabled:hover {
+            background-color: #f0f0f0;
+        }
+
+        .tree-node.selectable {
+            color: #000;
+        }
+
+        .tree-node.selectable:hover {
+            background-color: #e6f7ff;
+        }
+
+        .tree-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            /* Kích thước hộp */
+            height: 18px;
+            margin-right: 8px;
+            cursor: pointer;
+            border: 1px solid #999;
+            /* Viền hộp */
+            background-color: #fff;
+            /* Nền trắng */
+            border-radius: 3px;
+            /* Bo góc nhẹ */
+            font-family: monospace;
+            /* Dùng font monospace để + - căn giữa đẹp */
+            font-size: 16px;
+            line-height: 1;
+            color: #333;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        /* Trạng thái đóng: Dấu Cộng */
+        .tree-toggle.collapsed::before {
+            content: '+';
+            font-weight: normal;
+        }
+
+        /* Trạng thái mở: Dấu Trừ (Đậm) */
+        .tree-toggle.expanded {
+            background-color: #0056b3;
+            /* Đổi màu nền khi mở */
+            border-color: #666;
+        }
+
+        .tree-toggle.expanded::before {
+            content: '-';
+            font-weight: bold;
+            color: white;
+            /* Làm đậm dấu trừ */
+            font-size: 18px;
+            /* Tăng kích thước dấu trừ một chút cho rõ */
+            margin-top: -2px;
+            /* Căn chỉnh lại vị trí dọc một chút */
+        }
+
+        .tree-toggle.hidden {
+            visibility: hidden;
+            border: none;
+            /* Ẩn viền nếu không có con */
+            background: transparent;
+        }
+
+        .tree-toggle:hover {
+            border-color: #007bff;
+            color: #007bff;
+
+        }
+
+        .tree-children {
+            display: none;
+        }
+
+        .tree-children.visible {
+            display: block;
+        }
+
+        .tree-node-label {
+            display: block;
+            white-space: normal;
+            word-break: break-word;
+            text-align: left;
+            flex: 1;
+        }
+
+        /* Style cho ô input giả lập (DIV) */
+        .tree-select-trigger {
+            min-height: 40px;
+            display: flex;
+            align-items: flex-start;
+            cursor: pointer;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14pt;
+            width: 100%;
+            background: transparent;
+            white-space: pre-wrap;
+            color: #000;
+            padding: 4px;
+            text-align: left;
+        }
+
+        .tree-select-trigger:empty::before {
+            content: '--chọn ngành nghề--';
+            color: black;
+        }
+
+        /* Ẩn input gốc nhưng vẫn giữ trong DOM để lấy value */
+        .hidden-data-input {
+            display: none !important;
+        }
+
+        .instruction-text {
+            font-size: 11pt;
+            font-style: italic;
+            color: #666;
+            margin-top: 4px;
+            margin-left: 20px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h1>
+            <h2><span class="bold">Độc lập</span> - <span class="bold">Tự do</span> - <span class="bold">Hạnh
+                    phúc</span></h2>
+        </div>
+
+        <!-- Date -->
+        <div class="date-line">
+            Bắc Ninh, <span class="italic">ngày</span> {{CURRENT_DAY}} <span class="italic">tháng</span>
+            {{CURRENT_MONTH}}
+            <span class="italic">năm</span>
+            {{CURRENT_YEAR}}
+        </div>
+
+        <!-- Title -->
+        <div class="title">
+            GIẤY ĐỀ NGHỊ ĐĂNG KÝ HỘ KINH DOANH
+        </div>
+
+        <!-- Content -->
+        <div class="section">
+            <div style="display: flex; align-items: flex-end; gap: 8px; margin-left: 13%;">
+                <div style="white-space: nowrap;">Kính gửi: (Cơ quan đăng ký kinh doanh cấp xã)</div>
+                <span class="required-mark">*</span>
+                <input type="text" class="input-line input-medium" style="flex: 1;">
+            </div>
+        </div>
+
+        <div class="section">
+            <div style="display: flex; align-items: flex-end; gap: 8px;">
+                <div style="white-space: nowrap;">Tôi là <span class="italic">(ghi họ tên bằng chữ in hoa)</span>:
+                    {{FULL_NAME}}</div>
+                <div class="right" style="flex: 0 1 450px;">
+
+                </div>
+                <div style="white-space: nowrap;">Giới tính: {{SEX}}</div>
+
+            </div>
+        </div>
+
+        <div class="section">
+            <div style="display: flex; align-items: flex-end; gap: 8px;">
+                <div style="white-space: nowrap;">Sinh ngày: {{DATE_OF_BIRTH}}</div>
+                <div class="right" style="flex: 0 1 180px;">
+                </div>
+                <div style="white-space: nowrap; display: flex; align-items: center;">
+                    Dân tộc:
+                    <span class="required-mark">*</span>
+                    <input type="text" class="input-line input-mid" value="{{ETHNICITY}}"
+                        style="width: 100px; margin-left: 5px;">
+                </div>
+                <div style="white-space: nowrap; margin-left: 12px;">Quốc tịch: {{NATION}}</div>
+                <div class="right" style="flex: 1;">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div style="display: flex; align-items: flex-end; gap: 8px;">
+                <div style="white-space: nowrap;">Mã số thuế cá nhân (nếu có):{{NATION_NO}}</div>
+                <!-- <input type="text" class="input-line" style="flex: 1;">
+                </input> -->
+            </div>
+        </div>
+
+        <div class="section">
+            Loại giấy tờ pháp lý của cá nhân:
+            <div style="margin-top: 10px; display: flex; gap: 40px; align-items: center;">
+                <label style="display: flex; align-items: center; cursor: pointer;">
+                    <input type="checkbox" class="custom-x-checkbox" name="loai_giay_to" value="CCCD">
+                    Căn cước công dân
+                </label>
+                <label style="display: flex; align-items: center; cursor: pointer;">
+                    <input type="checkbox" class="custom-x-checkbox" name="loai_giay_to" value="CanCuoc">
+                    Căn cước
+                </label>
+            </div>
+        </div>
+
+        <div class="section">
+            <div style="display: flex; align-items: flex-end; gap: 8px;">
+                <div style="white-space: nowrap;">Số giấy tờ pháp lý của cá nhân: {{NATION_NO}}</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div style="display: flex; gap: 8px;">
+                <div style="white-space: nowrap;">Ngày cấp: {{DATE_OF_ISSUE}}</div>
+                <div class="right" style="flex: 0 1;">
+                </div>
+                <div style="white-space: nowrap;">Nơi cấp: {{PLACE_OF_ISSUE}}</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div style="display: flex; align-items: flex-end; gap: 8px;">
+                <div style="white-space: nowrap;">Có giá trị đến ngày <span class="italic">(nếu có)</span>:
+                    {{EXPIRED_DATE}}</div>
+
+            </div>
+        </div>
+
+        <div class="section">
+            <span>Địa chỉ thường trú:</span>
+            <div class="indent" style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                <div style="white-space: nowrap;">Số nhà, đường phố/tổ/xóm/ấp/thôn:</div><span
+                    class="required-mark">*</span>
+                <input type="text" class="input-line" style="flex: 1;" data-address-group="1">
+            </div>
+            <div class="indent" style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                <div style="white-space: nowrap;">Xã/Phường/Đặc khu: {{WARD}}</div>
+            </div>
+            <div class="indent" style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                <div style="white-space: nowrap;">Tỉnh/Thành phố: {{PROVINCE}}</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <span>Địa chỉ liên lạc:</span>
+            <div class="indent" style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                <div style="white-space: nowrap;">Số nhà, đường phố/tổ/xóm/ấp/thôn:</div><span
+                    class="required-mark">*</span>
+                <input type="text" class="input-line" style="flex: 1;" data-address-group="2">
+            </div>
+
+            <!-- Input view: Tỉnh trước, Xã sau -->
+            <div class="input_address_group" id="input_address_group_2">
+                <div class="indent" style="display: flex; align-items: flex-end; gap: 8px; margin-top: 8px;">
+                    <div style="white-space: nowrap;">Tỉnh/Thành phố:</div><span class="required-mark">*</span>
+                    <select class="cascading-select" id="address-2-province" style="flex: 1;">
+                        <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                    </select>
+                </div>
+                <div class="indent" style="display: flex; align-items: flex-end; gap: 8px; margin-top: 8px;">
+                    <div style="white-space: nowrap;">Xã/Phường/Đặc khu:</div><span class="required-mark">*</span>
+                    <select class="cascading-select" id="address-2-ward" style="flex: 1;">
+                        <option value="">-- Chọn Xã/Phường --</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Print view: Xã trước, Tỉnh sau (text only) -->
+            <div class="print_address_group" id="print_address_group_2">
+                <div class="indent" style="display: flex; align-items: flex-end; gap: 8px; margin-top: 8px;">
+                    <div style="white-space: nowrap;">Xã/Phường/Đặc khu:</div>
+                    <span class="address-text-display" id="print_address_2_ward"></span>
+                </div>
+                <div class="indent" style="display: flex; align-items: flex-end; gap: 8px; margin-top: 8px;">
+                    <div style="white-space: nowrap;">Tỉnh/Thành phố:</div>
+                    <span class="address-text-display" id="print_address_2_province"></span>
+                </div>
+            </div>
+        </div>
+        <div class="section" style="display: flex; align-items: flex-end; gap: 8px;">
+            <div style="white-space: nowrap;">Điện thoại <span class="italic">(nếu có)</span>:</div>
+            <input type="text" class="input-line input-mid">
+            <div style="white-space: nowrap; margin-left: 12px;">Email <span class="italic">(nếu có)</span>:</div>
+            <input type="text" class="input-line" style="flex: 1;">
+        </div>
+
+        <div class="section">
+            <div class="section-title" style="margin-top: 20px;">Đăng ký hộ kinh doanh do tôi là chủ hộ với các nội
+                dung sau:</div>
+        </div>
+
+        <div class="section">
+            <div style="display: flex; align-items: flex-start; gap: 3px;">
+                <div style="white-space: nowrap; padding-top: 10px ;"><span class="bold">1. Tên hộ kinh doanh</span>
+                    <span class="italic">(ghi bằng chữ in hoa)</span>:<span class="required-mark">*</span>
+                </div>
+                <textarea class="input-line auto-expand lined-textarea" rows="1" oninput="autoResize(this)" style="flex: 1; 
+                                 resize: none; 
+                                 overflow: hidden; 
+                                 background: transparent; 
+                                 min-height: 28px; 
+                                 white-space: pre-wrap; /* Cho phép xuống dòng */
+                                 word-break: break-word; /* Ngắt dòng nếu từ quá dài */"
+                    placeholder="Ví dụ: HỘ KINH DOANH NGUYỄN VĂN A"></textarea>
+            </div>
+            <div class="instruction-text"
+                style="margin-top: 8px; margin-bottom: 15px; border-left: 4px solid #007bff; background-color: #f8f9fa; padding: 10px; border-radius: 4px;">
+                <ul style="margin: 5px 0 0 20px; padding: 0; list-style-type: disc;">
+                    <li> <strong>Lưu ý:</strong> Tên bao gồm "Hộ kinh doanh" + Tên riêng. <br></li>
+                    <li> Tên riêng dùng bảng chữ cái tiếng Việt, các chữ F, J, Z, W, có thể kèm chữ số, ký hiệu.<br>
+                    </li>
+                    <li> Không được sử dụng các cụm từ “công ty”, “tổng công ty”, “tập đoàn”, “doanh nghiệp” để đặt tên
+                        hộ kinh
+                        doanh.</li>
+                </ul>
+
+            </div>
+        </div>
+        <br />
+        <br />
+        <!-- Page 2 -->
+        <div class="section">
+            <span class="bold">2. Địa chỉ trụ sở hộ kinh doanh:</span>
+            <div style="display: flex; align-items: flex-end; gap: 8px; margin-top: 8px;">
+                <div style="white-space: nowrap;">Số nhà, ngách, hẻm, ngõ, đường phố/tổ/xóm/ấp/thôn:</div>
+                <span class="required-mark">*</span>
+                <input type="text" class="input-line" style="flex: 1;" data-address-group="3">
+            </div>
+            <!-- Input view: Tỉnh trước, Xã sau -->
+            <div class="input_address_group" id="input_address_group_3">
+                <div style="display: flex; align-items: flex-end; gap: 8px; margin-top: 8px;">
+                    <div style="white-space: nowrap;">Tỉnh/Thành phố:</div><span class="required-mark">*</span>
+                    <select class="cascading-select" id="address-3-province" style="flex: 1;">
+                        <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                    </select>
+                </div>
+                <div style="display: flex; align-items: flex-end; gap: 8px; margin-top: 8px;">
+                    <div style="white-space: nowrap;">Xã/Phường/Đặc khu:</div><span class="required-mark">*</span>
+                    <select class="cascading-select" id="address-3-ward" style="flex: 1;">
+                        <option value="">-- Chọn Xã/Phường --</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Print view: Xã trước, Tỉnh sau (text only) -->
+            <div class="print_address_group" id="print_address_group_3">
+                <div style="display: flex; align-items: flex-end; gap: 8px; margin-top: 8px;">
+                    <div style="white-space: nowrap;">Xã/Phường/Đặc khu:</div>
+                    <span class="address-text-display" id="print_address_3_ward"></span>
+                </div>
+                <div style="display: flex; align-items: flex-end; gap: 8px; margin-top: 8px;">
+                    <div style="white-space: nowrap;">Tỉnh/Thành phố:</div>
+                    <span class="address-text-display" id="print_address_3_province"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 8px;">
+                <div style="white-space: nowrap;">Điện thoại <span class="italic">(nếu có)</span>:</div>
+                <input type="text" class="input-line" style="flex: 1;">
+                <div style="white-space: nowrap; margin-left: 12px;">Fax <span class="italic">(nếu có)</span>:</div>
+                <input type="text" class="input-line input-medium">
+            </div>
+            <div style="display: flex; align-items: flex-end; gap: 8px;">
+                <div style="white-space: nowrap;">Email <span class="italic">(nếu có)</span>:</div>
+                <input type="text" class="input-line" style="flex: 1;">
+                <div style="white-space: nowrap; margin-left: 12px;">Website <span class="italic">(nếu có)</span>:
+                </div>
+                <input type="text" class="input-line input-medium">
+            </div>
+        </div>
+
+        <div class="section">
+            <span class="bold">3. Ngành, nghề kinh doanh<sup>1</sup>:</span><span class="required-mark">*</span>
+
+            <div class="instruction-text"
+                style="margin-top: 8px; margin-bottom: 15px; border-left: 4px solid #007bff; background-color: #f8f9fa; padding: 10px; border-radius: 4px;">
+                <strong> Hướng dẫn đăng ký ngành nghề:</strong>
+                <ul style="margin: 5px 0 0 20px; padding: 0; list-style-type: disc;">
+                    <li>
+                        <strong>Nguyên tắc chung:</strong> Chủ hộ kinh doanh phải đăng ký theo <strong>Mã ngành cấp
+                            4</strong> (4 chữ số).
+                    </li>
+                    <li>
+                        <strong>Ghi chi tiết:</strong> Nếu muốn đăng ký chi tiết hơn ngành cấp 4:
+                        <br> Hãy lựa chọn ngành cấp 4, sau đó ấn nút + bên trái ngành cấp 4 để thêm dòng ngành, nghề chi
+                        tiết.
+                        <br><em>(Ví dụ: Chọn "5630 - Dịch vụ khách sạn và lưu trú", sau đó chọn "56302 - Quán cà phê,
+                            giải khát").</em>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+        <div class="table-with-add-btn">
+            <button type="button" class="add-row-btn" id="addIndustryRowBtn" title="Thêm dòng">+</button>
+            <button type="button" class="delete-row-btn" id="deleteIndustryRowBtn" title="Xóa dòng">−</button>
+            <table id="industryTable" style="max-width: 100%; table-layout: fixed; word-break: break-word;">
+                <colgroup>
+                    <col style="width: 9%">
+                    <col style="width: 35%">
+                    <col style="width: 17%">
+                    <col style="width: 39%">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên ngành</th>
+                        <th>Mã ngành<sup>2</sup></th>
+                        <th>Ngành, nghề kinh doanh chính<br /><span class="italic" style="font-weight: 100;">(Đánh
+                                dấu x để chọn
+                                một trong các ngành, nghề đã kê khai)</span></th>
+                    </tr>
+                </thead>
+                <tbody id="industryTableBody">
+                    <tr class="industry-row">
+                        <td><textarea class="input-line" style="width: 100%; text-align: center;" rows="1"></textarea>
+                        </td>
+                        <td><textarea class="input-line" style="width: 100%;" rows="1"></textarea></td>
+                        <td><textarea class="input-line" style="width: 100%; text-align: center;" rows="1"></textarea>
+                        </td>
+                        <td class="industry-primary-cell">
+                            <input type="checkbox" class="industry-primary-checkbox" name="primary-industry">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <span class="bold">4. Vốn kinh doanh:</span>
+        </div>
+
+        <div class="section" style="display: flex; align-items: flex-end; gap: 8px;">
+            <div style="white-space: nowrap;"><span>Tổng số</span> <span class="italic">(bằng số, bằng chữ,
+                    VNĐ)</span>:</div><span class="required-mark">*</span>
+            <input id="von-kinh-doanh" class="input-line"
+                style="flex: 1; min-height: 28px; resize: none; overflow: hidden; background: transparent;"
+                oninput="formatCurrencyInText(this); "></input>
+        </div>
+
+        <div class="section">
+            <span class="bold">5. Thông tin đăng ký thuế:</span>
+        </div>
+
+        <div class="section">
+            5.1. Địa chỉ nhận thông báo thuế (chỉ kê khai nếu địa chỉ nhận thông báo thuế khác địa chỉ trụ sở
+            chính):
+            <div class="indent" style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                <div style="white-space: nowrap;">Số nhà, đường phố/tổ/xóm/ấp/thôn:</div>
+                <input type="text" class="input-line" style="flex: 1;" data-address-group="4">
+            </div>
+
+            <!-- Input view: Tỉnh trước, Xã sau -->
+            <div class="input_address_group" id="input_address_group_4">
+                <div class="indent" style="display: flex; align-items: flex-end; gap: 8px; margin-top: 8px;">
+                    <div style="white-space: nowrap;">Tỉnh/Thành phố:</div>
+                    <select class="cascading-select" id="address-4-province" style="flex: 1;">
+                        <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                    </select>
+                </div>
+                <div class="indent" style="display: flex; align-items: flex-end; gap: 8px; margin-top: 8px;">
+                    <div style="white-space: nowrap;">Xã/Phường/Đặc khu:</div>
+                    <select class="cascading-select" id="address-4-ward" style="flex: 1;">
+                        <option value="">-- Chọn Xã/Phường --</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Print view: Xã trước, Tỉnh sau (text only) -->
+            <div class="print_address_group" id="print_address_group_4">
+                <div class="indent" style="display: flex; align-items: flex-end; gap: 8px; margin-top: 8px;">
+                    <div style="white-space: nowrap;">Xã/Phường/Đặc khu:</div>
+                    <span class="address-text-display" id="print_address_4_ward"></span>
+                </div>
+                <div class="indent" style="display: flex; align-items: flex-end; gap: 8px; margin-top: 8px;">
+                    <div style="white-space: nowrap;">Tỉnh/Thành phố:</div>
+                    <span class="address-text-display" id="print_address_4_province"></span>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: flex-end; gap: 8px; margin-top: 8px;">
+                <div style="white-space: nowrap;">Điện thoại <span class="italic">(nếu có)</span>:</div>
+                <input type="text" class="input-line input-mid">
+                <div style="white-space: nowrap;">Email <span class="italic">(nếu có)</span>:
+                </div>
+                <input type="text" class="input-line" style="flex: 1;">
+            </div>
+        </div>
+        <!-- Page 3 -->
+        <div class="section">
+            5.2. Ngày bắt đầu hoạt động<sup>3</sup> <span class="italic">(trường hợp hộ kinh doanh dự kiến bắt
+                đầu hoạt động kể từ ngày được cấp Giấy chứng nhận đăng ký hộ kinh doanh thì không cần kê khai
+                nội dung này)</span>: <input type="text" class="input-line input-short">/<input type="text"
+                class="input-line input-short">/<input type="text" class="input-line input-short">
+        </div>
+        <div class="section">
+            <div style="display: flex; align-items: flex-end; gap: 8px;">
+                <span>5.3. Tổng số lao động <span class="italic">(dự kiến)</span>:</span>
+                <input type="text" class="input-line" style="flex: 1;">
+            </div>
+        </div>
+
+        <div class="section">
+            5.4. Địa điểm kinh doanh của hộ kinh doanh <span class="italic">(Chi kê khai khi có địa điểm kinh
+                doanh khác trụ sở hộ kinh doanh)</span>:
+        </div>
+
+        <div class="table-with-add-btn">
+            <!-- Nút điều khiển -->
+            <button type="button" class="add-row-btn" onclick="addLocationRow()" title="Thêm địa điểm">+</button>
+            <button type="button" class="delete-row-btn" id="deleteLocationBtn" onclick="deleteLocationRow()"
+                title="Xóa địa điểm">−</button>
+
+            <table id="table-5-4-ddkd">
+                <colgroup>
+                    <col style="width: 8%">
+                    <col style="width: 24%">
+                    <col style="width: 17%">
+                    <col style="width: 17%">
+                    <col style="width: 17%">
+                    <col style="width: 17%">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th rowspan="2" style="font-weight: normal;">STT</th>
+                        <th rowspan="2" style="font-weight: normal;">Tên địa điểm kinh doanh</th>
+                        <th colspan="3" style="font-weight: normal;">Địa chỉ kinh doanh</th>
+                        <th rowspan="2" style="font-weight: normal;">Ngày bắt đầu hoạt động</th>
+                    </tr>
+                    <tr>
+                        <th style="font-weight: normal;">Số nhà, đường<br />phố/tổ/xóm/ấp/thôn</th>
+                        <th style="font-weight: normal;">Tỉnh/<br />thành phố</th>
+                        <th style="font-weight: normal;">Xã/Phường/<br />Đặc khu</th>
+                    </tr>
+                </thead>
+                <tbody id="locationTableBody">
+                    <!-- DÒNG MẪU (Duy nhất 1 dòng lúc đầu) -->
+                    <tr class="location-row">
+                        <td style="text-align: center; vertical-align: middle; padding: 2px;">
+                            <textarea class="input-line input-short" readonly rows="1"
+                                style="text-align: center; resize: none; overflow: hidden; min-height: 24px; height: 24px; border: none; background: transparent;">1</textarea>
+                        </td>
+                        <td style="vertical-align: middle; padding: 2px;">
+                            <textarea class="input-line input-full auto-expand" rows="1" oninput="autoResize(this)"
+                                style="width: 100%; resize: none; overflow: hidden; background: transparent; min-height: 30px; box-sizing: border-box; border: none; word-break: break-word;"></textarea>
+                        </td>
+                        <td style="vertical-align: middle; padding: 2px;">
+                            <textarea class="input-line input-mid auto-expand" rows="1" oninput="autoResize(this)"
+                                style="width: 100%; resize: none; overflow: hidden; background: transparent; min-height: 30px; box-sizing: border-box; border: none; word-break: break-word;"></textarea>
+                        </td>
+                        <td style="vertical-align: middle; padding: 2px;">
+                            <!-- Lưu ý ID: tinh_ddkd_1 -->
+                            <select class="cascading-select-table" id="tinh_ddkd_1" style="width: 100%;">
+                                <option value="">--Chọn Tỉnh/TP--</option>
+                            </select>
+                        </td>
+                        <td style="vertical-align: middle; padding: 2px;">
+                            <!-- Lưu ý ID: xa_ddkd_1 -->
+                            <select class="cascading-select-table" id="xa_ddkd_1" style="width: 100%;">
+                                <option value="">--Chọn Xã/Phường--</option>
+                            </select>
+                        </td>
+                        <td style="vertical-align: middle; padding: 2px;">
+                            <textarea class="input-line input-mid auto-expand" rows="1" oninput="autoResize(this)"
+                                style="width: 100%; resize: none; overflow: hidden; background: transparent; min-height: 30px; box-sizing: border-box; border: none;"></textarea>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <span class="bold">6. Chủ thể thành lập hộ kinh doanh</span> <span class="italic">(đánh dấu X
+                vào ô thích hợp)</span>:<span class="required-mark">*</span>
+        </div>
+
+        <div class="section">
+            <div style="display: flex; gap: 40px; align-items: center;">
+                <label style="display: flex; align-items: center; cursor: pointer;">
+                    <input type="checkbox" class="custom-x-checkbox" name="loai_chu_the" value="Cá nhân">
+                    Cá nhân
+                </label>
+                <label style="display: flex; align-items: center; cursor: pointer;">
+                    <input type="checkbox" class="custom-x-checkbox" name="loai_chu_the"
+                        value="Các thành viên hộ gia đình">
+                    Các thành viên hộ gia đình
+                </label>
+            </div>
+        </div>
+        <div class="section">
+            <span class="bold">7. Thông tin về các thành viên hộ gia đình tham gia thành lập hộ kinh
+                doanh<sup>4</sup>:</span>
+        </div>
+        <div class="table-with-add-btn" style="page-break-inside: avoid;">
+            <button type="button" class="add-row-btn" onclick="addMemberRow()" title="Thêm thành viên">+</button>
+            <button type="button" class="delete-row-btn" id="deleteMemberBtn" onclick="deleteMemberRow()"
+                title="Xóa thành viên">−</button>
+
+            <table id="table-7-members">
+                <colgroup>
+                    <col style="width: 5%">
+                    <col style="width: 12%">
+                    <col style="width: 12%">
+                    <col style="width: 10%">
+                    <col style="width: 10%">
+                    <col style="width: 10%">
+                    <col style="width: 12%">
+                    <col style="width: 12%">
+                    <col style="width: 19%">
+                    <col style="width: 8%">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th style="font-weight: normal;">STT</th>
+                        <th style="font-weight: normal;">Họ tên</th>
+                        <th style="font-weight: normal;">Ngày,<br />tháng,<br />năm sinh</th>
+                        <th style="font-weight: normal;">Giới<br />tính</th>
+                        <th style="font-weight: normal;">Quốc<br />tịch</th>
+                        <th style="font-weight: normal;">Dân<br />tộc</th>
+                        <th style="font-weight: normal;">Địa chỉ<br />thường<br />trú</th>
+                        <th style="font-weight: normal;">Địa chỉ<br />liên lạc</th>
+                        <th style="font-weight: normal;">Số, ngày cấp,<br />cơ quan cấp<br />CCCD/CMND</th>
+                        <th style="font-weight: normal;">Chữ<br />ký</th>
+                    </tr>
+                </thead>
+                <tbody id="memberTableBody">
+                    <!-- Header phụ -->
+                    <tr class="header-count-row">
+                        <td style="font-weight: bold; text-align: center;">1</td>
+                        <td style="font-weight: bold; text-align: center;">2</td>
+                        <td style="font-weight: bold; text-align: center;">3</td>
+                        <td style="font-weight: bold; text-align: center;">4</td>
+                        <td style="font-weight: bold; text-align: center;">5</td>
+                        <td style="font-weight: bold; text-align: center;">6</td>
+                        <td style="font-weight: bold; text-align: center;">7</td>
+                        <td style="font-weight: bold; text-align: center;">8</td>
+                        <td style="font-weight: bold; text-align: center;">9</td>
+                        <td style="font-weight: bold; text-align: center;">10</td>
+                    </tr>
+
+                    <!-- DÒNG MẪU (STT 1) -->
+                    <tr class="member-row">
+                        <!-- Cột STT: Căn giữa -->
+                        <td style="text-align: center; vertical-align: middle; padding: 0;">
+                            <textarea class="input-line" readonly
+                                style="text-align: center; resize: none; overflow: hidden; height: 28px; border: none; background: transparent; width: 100%; padding-top: 2px;">1</textarea>
+                        </td>
+
+                        <!-- Các cột dữ liệu: Padding 4px, Min-height 28px -->
+                        <td style="vertical-align: middle; padding: 4px;">
+                            <textarea class="input-line input-full auto-expand" rows="1" oninput="autoResize(this)"
+                                style="width: 100%; resize: none; overflow: hidden; background: transparent; min-height: 28px; box-sizing: border-box; border: none; word-break: break-word;"></textarea>
+                        </td>
+                        <td style="vertical-align: middle; padding: 4px;">
+                            <textarea class="input-line auto-expand" rows="1" oninput="autoResize(this)"
+                                style="width: 100%; resize: none; overflow: hidden; background: transparent; min-height: 28px; box-sizing: border-box; border: none; text-align: center;"></textarea>
+                        </td>
+                        <td style="vertical-align: middle; padding: 4px;">
+                            <textarea class="input-line auto-expand" rows="1" oninput="autoResize(this)"
+                                style="width: 100%; resize: none; overflow: hidden; background: transparent; min-height: 28px; box-sizing: border-box; border: none; text-align: center;"></textarea>
+                        </td>
+                        <td style="vertical-align: middle; padding: 4px;">
+                            <textarea class="input-line auto-expand" rows="1" oninput="autoResize(this)"
+                                style="width: 100%; resize: none; overflow: hidden; background: transparent; min-height: 28px; box-sizing: border-box; border: none; text-align: center;"></textarea>
+                        </td>
+                        <td style="vertical-align: middle; padding: 4px;">
+                            <textarea class="input-line auto-expand" rows="1" oninput="autoResize(this)"
+                                style="width: 100%; resize: none; overflow: hidden; background: transparent; min-height: 28px; box-sizing: border-box; border: none; text-align: center;"></textarea>
+                        </td>
+                        <td style="vertical-align: middle; padding: 4px;">
+                            <textarea class="input-line input-full auto-expand" rows="1" oninput="autoResize(this)"
+                                style="width: 100%; resize: none; overflow: hidden; background: transparent; min-height: 28px; box-sizing: border-box; border: none; word-break: break-word;"></textarea>
+                        </td>
+                        <td style="vertical-align: middle; padding: 4px;">
+                            <textarea class="input-line input-full auto-expand" rows="1" oninput="autoResize(this)"
+                                style="width: 100%; resize: none; overflow: hidden; background: transparent; min-height: 28px; box-sizing: border-box; border: none; word-break: break-word;"></textarea>
+                        </td>
+                        <td style="vertical-align: middle; padding: 4px;">
+                            <textarea class="input-line input-full auto-expand" rows="1" oninput="autoResize(this)"
+                                style="width: 100%; resize: none; overflow: hidden; background: transparent; min-height: 28px; box-sizing: border-box; border: none; word-break: break-word;"></textarea>
+                        </td>
+
+                        <!-- Cột chữ ký -->
+                        <td style="vertical-align: middle;"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="commitment">
+            <p style="margin-bottom: 10px;"><span>Tôi xin cam kết:</span></p>
+            <p style="margin-bottom: 8px;">- Bản thân và các thành viên hộ kinh doanh <span class="italic">(trường
+                    hợp
+                    hộ kinh doanh do các thành viên hộ gia đình đăng ký thành lập)</span> không thuộc diện
+                pháp
+                luật
+                cấm
+                kinh doanh; không là chủ doanh nghiệp tư nhân; không là thành viên hợp danh của công ty hợp
+                danh
+                <span class="italic">(trừ trường hợp được sự nhất trí của các thành viên hợp danh còn
+                    lại)</span>;
+            </p>
+
+            <p style="margin-bottom: 8px;">- Địa chỉ trụ sở hộ kinh doanh thuộc quyền sở hữu/quyền sử dụng
+                hợp
+                pháp
+                của
+                hộ kinh doanh và được sử dụng đúng mục đích theo quy định của pháp luật;</p>
+            <p style="margin-bottom: 8px;">- Hoàn toàn chịu trách nhiệm trước pháp luật về tính hợp pháp,
+                chính
+                xác
+                và
+                trung thực của nội dung đăng ký trên.</p>
+        </div>
+
+        <div class="signature-section">
+            <p>CHỦ HỘ KINH DOANH</p>
+            <p class="italic" style="font-size: 13pt; font-weight: normal; margin-top: 5px; margin-right: 20px;">(Ký
+                và ghi họ
+                tên)<sup>5</sup></p>
+        </div>
+
+        <!-- Footnotes -->
+        <div class="footnotes" style="margin-top: 300px;">
+            <div class="footnote">
+                <sup>1</sup>- Hộ kinh doanh có quyền tự do kinh doanh trong những ngành, nghề mà luật không cấm;
+            </div>
+            <div class="footnote">
+                - Các ngành, nghề cấm đầu tư kinh doanh quy định tại Điều 6 Luật Đầu tư;
+            </div>
+            <div class="footnote">
+                - Đối với ngành, nghề đầu tư kinh doanh có điều kiện, hộ kinh doanh chỉ được kinh doanh khi có
+                đủ điều kiện theo quy định. Danh mục ngành, nghề đầu tư kinh doanh có điều kiện quy định tại Phụ
+                lục IV ban hành kèm theo Luật Đầu tư.
+            </div>
+            <div class="footnote">
+                <sup>2</sup> Ghi tên ngành và mã ngành cấp bốn trong Hệ thống ngành kinh tế Việt Nam đối với
+                ngành, nghề kinh
+                doanh chính. Đối với các ngành, nghề kinh doanh khác, hộ kinh doanh được ghi tự do (free text)
+                và không cần ghi mã ngành cấp bốn.
+            </div>
+            <div class="footnote">
+                <sup>3</sup> Trường hợp hộ kinh doanh được cấp Giấy chứng nhận đăng ký hộ kinh doanh sau ngày
+                bắt đầu hoạt
+                động đã kê khai thì ngày bắt đầu hoạt động là ngày hộ kinh doanh được cấp Giấy chứng nhận đăng
+                ký hộ kinh doanh.
+            </div>
+            <div class="footnote">
+                <sup>4</sup> Chi kê khai trong trường hợp chủ thể thành lập hộ kinh doanh là các thành viên hộ
+                gia
+                đình và kê khai cả thông tin của chủ hộ tại Bảng này.
+            </div>
+            <div class="footnote">
+                <sup>5</sup> Chủ hộ kinh doanh ký trực tiếp vào phần này.
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Virtual Keyboard Container -->
+    <div id="keyboardContainer" class="keyboard-wrapper">
+        <div class="keyboard-header">
+            <span class="keyboard-title">Bàn phím</span>
+            <button id="closeKeyboard" class="keyboard-close">✕ Đóng</button>
+        </div>
+        <div id="keyboard" class="simple-keyboard"></div>
+    </div>
+
+    <!-- CDN Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/css/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/index.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <!-- Virtual Keyboard Module -->
+    <!-- <script src="virtual-keyboard.js"></script> -->
+
+    <style>
+        /* Virtual Keyboard Wrapper */
+        .keyboard-wrapper {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: -500px;
+            background: #fff;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+            z-index: 9999;
+            transition: bottom 0.3s ease-in-out;
+            border-top: 2px solid #667eea;
+        }
+
+        .keyboard-wrapper.active {
+            bottom: 0;
+        }
+
+        .keyboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .keyboard-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .keyboard-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .keyboard-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Simple Keyboard Custom Style */
+        .simple-keyboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
+            background: #f8f9fa;
+        }
+
+        .simple-keyboard .hg-button {
+            height: 50px;
+            font-size: 18px;
+            background: white;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            transition: all 0.15s;
+        }
+
+        .simple-keyboard .hg-button:active {
+            background: #667eea;
+            color: white;
+            transform: scale(0.95);
+        }
+
+        /* Hide elements when printing */
+        @media print {
+            .keyboard-wrapper {
+                display: none !important;
+            }
+
+            body {
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+                padding: 20mm;
+            }
+        }
+
+        /* Input focus highlight */
+        input:focus,
+        textarea:focus {
+            outline: 2px solid #667eea;
+            outline-offset: 2px;
+            background-color: #f0f4ff;
+        }
+
+        /* Cascading Select Dropdown Styling */
+        .cascading-select {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14pt;
+            background: transparent;
+            border: none;
+            padding: 2px;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+            color: black;
+            flex: 1;
+            width: 100%;
+            min-height: 28px;
+            word-wrap: break-word;
+            white-space: normal;
+            display: flex;
+            align-items: center;
+            border-bottom: dotted 1px black;
+        }
+
+        .cascading-select-table {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14pt;
+            background: transparent;
+            border: none;
+            padding: 2px;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+            color: black;
+            flex: 1;
+            width: 100%;
+            min-height: 28px;
+            word-wrap: break-word;
+            white-space: normal;
+            display: flex;
+            align-items: center;
+        }
+
+        .cascading-select:focus {
+            outline: none;
+            background-color: transparent;
+        }
+
+        .cascading-select:disabled {
+            color: black;
+            cursor: not-allowed;
+        }
+
+        /* Hide default arrow */
+        .cascading-select {
+            background-image: linear-gradient(to right, black, black);
+            background-position: right 5px center;
+            background-size: 1px 1px;
+            background-repeat: no-repeat;
+            padding-right: 8px;
+        }
+    </style>
+
+    <script src="province-ward.js"></script>
+    <script src="select-tree.js"></script>
+
+    <script>
+        // --- HÀM FORMAT TIỀN TỆ THÔNG MINH ---
+        /**
+         * Format currency với dấu chấm phân cách hàng nghìn
+         * Không ảnh hưởng đến chữ cái, dấu ngoặc, dấu câu
+         * Ví dụ: "1000000 VNĐ" -> "1.000.000 VNĐ"
+         */
+        function formatCurrencyInText(textarea) {
+            const originalValue = textarea.value;
+            const cursorPos = textarea.selectionStart; // Lưu vị trí con trỏ
+
+            // Step 1: Tách các phần: số, chữ, dấu
+            // Pattern: (digits with existing dots) + (non-digit part)
+            // Bỏ tất cả dấu chấm cũ và định dạng lại
+            const numberPart = originalValue.replace(/\./g, ''); // Loại bỏ tất cả dấu chấm
+
+            // Step 2: Format lại phần số với dấu chấm mới
+            // Regex tìm vị trí cần thêm dấu chấm: giữa các chữ số, cứ 3 chữ số từ phải
+            const formattedValue = numberPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+            // Step 3: Chỉ cập nhật nếu giá trị thay đổi (tránh di chuyển con trỏ không cần thiết)
+            if (formattedValue !== originalValue) {
+                // Tính toán sự thay đổi vị trí con trỏ dựa trên số dấu chấm được thêm vào
+                const dotsAddedBeforeCursor = (formattedValue.substring(0, cursorPos).match(/\./g) || []).length -
+                    (numberPart.substring(0, cursorPos).match(/\./g) || []).length;
+
+                textarea.value = formattedValue;
+
+                // Di chuyển con trỏ theo
+                const newCursorPos = Math.min(cursorPos + dotsAddedBeforeCursor, formattedValue.length);
+                textarea.setSelectionRange(newCursorPos, newCursorPos);
+            }
+        }
+
+        // --- HÀM TỰ ĐỘNG GIÃN DÒNG TEXTAREA ---
+        function autoResize(textarea) {
+            // KHÔNG autoResize cho STT textarea (readonly)
+            if (textarea.hasAttribute('readonly')) {
+                return;
+            }
+
+            // Tìm dòng (tr) chứa textarea - cho bảng
+            const row = textarea.closest('tr');
+
+            if (row) {
+                // === CASE 1: Textarea nằm TRONG bảng (tr) ===
+                // Lấy tất cả auto-expand textareas trong dòng
+                const textareasInRow = row.querySelectorAll('textarea.auto-expand');
+
+                // Step 1: Reset height của tất cả textarea để đo chính xác
+                textareasInRow.forEach(ta => {
+                    ta.style.height = 'auto';
+                });
+
+                // Step 2: Tính maxHeight dựa trên scrollHeight của mỗi textarea
+                let maxHeight = 28; // min-height default
+                textareasInRow.forEach(ta => {
+                    const scrollHeight = ta.scrollHeight;
+                    if (scrollHeight > maxHeight) {
+                        maxHeight = scrollHeight;
+                    }
+                });
+
+                // Step 3: Set chiều cao cho tất cả textarea trong dòng
+                const finalHeight = maxHeight + 20; // +20px buffer để đảm bảo dòng cuối không bị cắt
+                textareasInRow.forEach(ta => {
+                    ta.style.height = finalHeight + 'px';
+                });
+            } else {
+                // === CASE 2: Textarea nằm NGOÀI bảng (standalone) ===
+                // Reset height để đo chính xác
+                textarea.style.height = 'auto';
+
+                // Tính scrollHeight (nội dung thực tế)
+                const scrollHeight = textarea.scrollHeight;
+
+                // Nếu là lined-textarea, phải align với line-height (27px)
+                const lineHeight = 27;
+                if (textarea.classList.contains('lined-textarea')) {
+                    // Tính số dòng cần thiết (làm tròn lên)
+                    const linesNeeded = Math.ceil(scrollHeight / lineHeight);
+                    const finalHeight = linesNeeded * lineHeight + 5; // +10px padding
+                    textarea.style.height = finalHeight + 'px';
+                } else {
+                    // Textarea thường - set height = scrollHeight + buffer
+                    const finalHeight = scrollHeight + 20;
+                    textarea.style.height = finalHeight + 'px';
+                }
+            }
+        }
+
+        // Hàm helper: Gọi autoResize cho tất cả textarea có class auto-expand
+        function autoResizeAll() {
+            const textareas = document.querySelectorAll('.auto-expand');
+            textareas.forEach(textarea => {
+                autoResize(textarea);
+            });
+        }
+
+        // Kích hoạt giãn dòng khi trang vừa tải (để xử lý dữ liệu load từ API nếu có)
+        document.addEventListener('DOMContentLoaded', function () {
+            autoResizeAll();
+
+            // Thêm event listener cho tất cả textarea auto-expand
+            const textareas = document.querySelectorAll('.auto-expand');
+            textareas.forEach(textarea => {
+                // Khi user nhập
+                textarea.addEventListener('input', function () {
+                    autoResize(this);
+                });
+
+                // Theo dõi khi nội dung thay đổi (restore dữ liệu)
+                textarea.addEventListener('change', function () {
+                    setTimeout(() => autoResize(this), 10);
+                });
+            });
+        });
+
+        // Gọi lại autoResize khi window resize (để đảm bảo textarea mở rộng theo)
+        window.addEventListener('resize', function () {
+            autoResizeAll();
+        });
+
+        // Gọi lại autoResize sau khi restore từ PDF (multiple delays để catch restore timing)
+        window.addEventListener('pageshow', function () {
+            setTimeout(autoResizeAll, 50);
+            setTimeout(autoResizeAll, 200);
+            setTimeout(autoResizeAll, 500);
+        });
+
+        // Nếu có thay đổi trong body (restore dữ liệu), gọi autoResize
+        const observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                if (mutation.type === 'childList' || mutation.type === 'characterData') {
+                    // Check nếu textarea nào có dữ liệu mới
+                    const textareas = document.querySelectorAll('.auto-expand');
+                    textareas.forEach(ta => {
+                        if (ta.value && ta.scrollHeight > parseInt(ta.style.height || '30')) {
+                            autoResize(ta);
+                        }
+                    });
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true,
+                characterData: true
+            });
+        });
+
+        // Xử lý Mutually Exclusive cho nhóm checkbox
+        document.addEventListener('change', function (event) {
+            // Kiểm tra xem element được thay đổi có phải là custom-x-checkbox không
+            if (event.target.classList.contains('custom-x-checkbox')) {
+                const checkbox = event.target;
+                const groupName = checkbox.getAttribute('name');
+
+                // Chỉ xử lý nếu checkbox có thuộc tính name
+                if (groupName) {
+                    // Nếu checkbox được check
+                    if (checkbox.checked) {
+                        // Tìm tất cả các checkbox khác có cùng name
+                        const allCheckboxes = document.querySelectorAll(
+                            `input.custom-x-checkbox[name="${groupName}"]`
+                        );
+
+                        // Bỏ check tất cả các checkbox khác
+                        allCheckboxes.forEach(function (cb) {
+                            if (cb !== checkbox) {
+                                cb.checked = false;
+                            }
+                        });
+                    }
+                }
+            }
+            // Xử lý checkbox cho cột "Ngành, nghề kinh doanh chính"
+            // ... (Phần logic checkbox custom-x-checkbox giữ nguyên) ...
+
+            // --- FIX LOGIC: Xử lý checkbox chọn Ngành chính ---
+            if (event.target.classList.contains('industry-primary-checkbox')) {
+                const currentCheckbox = event.target;
+                const currentCell = currentCheckbox.closest('.industry-primary-cell');
+
+                if (currentCheckbox.checked) {
+                    // 1. Tìm tất cả checkbox cùng loại trong bảng
+                    const allCheckboxes = document.querySelectorAll('.industry-primary-checkbox');
+
+                    allCheckboxes.forEach(cb => {
+                        // Tìm ô chứa của checkbox đó
+                        const parentCell = cb.closest('.industry-primary-cell');
+
+                        if (cb !== currentCheckbox) {
+                            // Bỏ tích input
+                            cb.checked = false;
+                            // FIX LỖI: Xóa class visual của ô cũ đi
+                            if (parentCell) parentCell.classList.remove('checked');
+                        }
+                    });
+
+                    // 2. Thêm visual cho ô hiện tại
+                    currentCell.classList.add('checked');
+                } else {
+                    // Nếu bỏ tích chính ô đó -> Xóa visual
+                    currentCell.classList.remove('checked');
+                }
+            }
+        });
+
+        // --- QUẢN LÝ BẢNG 5.4 (ĐỊA ĐIỂM KINH DOANH) ---
+
+        function addLocationRow() {
+            const tbody = document.getElementById('locationTableBody');
+            const firstRow = tbody.querySelector('.location-row');
+            if (!firstRow) return;
+
+            // 1. Clone dòng
+            const newRow = firstRow.cloneNode(true);
+            const rowCount = tbody.rows.length + 1;
+
+            // 2. Reset các ô Textarea
+            const textareas = newRow.querySelectorAll('textarea');
+            textareas.forEach(t => {
+                t.value = '';
+
+                // Xóa inline style height để reset về state ban đầu
+                t.style.height = '';
+
+                // Đặt explicit height cho STT textarea (readonly)
+                if (t.hasAttribute('readonly')) {
+                    t.style.height = '28px';
+                    t.style.minHeight = '28px';
+                }
+            });
+
+            // 3. XỬ LÝ DROPDOWN (QUAN TRỌNG)
+            const selectTinh = newRow.querySelector('select[id^="tinh_ddkd_"]');
+            const selectXa = newRow.querySelector('select[id^="xa_ddkd_"]');
+
+            if (selectTinh && selectXa) {
+                // Tạo ID mới duy nhất: tinh_ddkd_2, tinh_ddkd_3...
+                const newIdTinh = `tinh_ddkd_${rowCount}`;
+                const newIdXa = `xa_ddkd_${rowCount}`;
+
+                selectTinh.id = newIdTinh;
+                selectXa.id = newIdXa;
+
+                // Reset giá trị
+                selectTinh.value = "";
+                selectXa.innerHTML = '<option value="">--Chọn Xã/Phường--</option>';
+
+                // Populate provinces cho select mới
+                if (typeof populateProvinceSelect === 'function') {
+                    populateProvinceSelect(selectTinh);
+                }
+
+                // Gán sự kiện onchange cho select Tỉnh mới
+                selectTinh.onchange = function () {
+                    const provinceId = this.value;
+
+                    // Reset ward select
+                    while (selectXa.options.length > 1) {
+                        selectXa.remove(1);
+                    }
+                    selectXa.disabled = !provinceId;
+
+                    if (!provinceId) return;
+
+                    // Gọi hàm load xã từ province-ward.js (nhận provinceId và wardSelect element)
+                    if (typeof loadWards === 'function') {
+                        loadWards(provinceId, selectXa);
+                    } else {
+                        console.error('Không tìm thấy hàm loadWards');
+                    }
+                };
+            }
+
+            // 4. Thêm vào bảng
+            tbody.appendChild(newRow);
+
+            // 5. Gọi autoResize cho tất cả textarea auto-expand trong dòng mới
+            const newTextareas = newRow.querySelectorAll('textarea.auto-expand');
+            newTextareas.forEach(t => {
+                if (typeof autoResize === 'function') {
+                    autoResize(t);
+                }
+            });
+
+            // 6. Cập nhật STT (tận dụng hàm updateSTT từ select-tree.js)
+            updateSTT_Location();
+        }
+
+        function deleteLocationRow() {
+            const tbody = document.getElementById('locationTableBody');
+            if (tbody.rows.length > 1) {
+                tbody.removeChild(tbody.lastElementChild);
+                updateSTT_Location();
+            } else {
+                alert('Phải giữ lại ít nhất 1 dòng.');
+            }
+        }
+
+        // Hàm updateSTT được tận dụng từ select-tree.js (Bảng 3), customize cho Bảng 5.4
+        function updateSTT_Location() {
+            const locationTableBody = document.getElementById('locationTableBody');
+            if (!locationTableBody) return;
+
+            const rows = locationTableBody.querySelectorAll('.location-row');
+            rows.forEach((row, index) => {
+                const sttInput = row.cells[0].querySelector('textarea');
+                if (sttInput) {
+                    sttInput.value = index + 1;
+                }
+            });
+
+            // Ẩn hiện nút xóa
+            const deleteBtn = document.getElementById('deleteLocationBtn');
+            if (deleteBtn) {
+                if (rows.length > 1) deleteBtn.classList.add('visible');
+                else deleteBtn.classList.remove('visible');
+            }
+        }
+
+        // --- QUẢN LÝ BẢNG 7 (THÀNH VIÊN) ---
+
+        function updateMemberSTT() {
+            const rows = document.querySelectorAll('#memberTableBody .member-row');
+            rows.forEach((row, index) => {
+                const sttInput = row.cells[0].querySelector('textarea');
+                if (sttInput) sttInput.value = index + 1;
+            });
+
+            // Ẩn hiện nút xóa
+            const deleteBtn = document.getElementById('deleteMemberBtn');
+            if (deleteBtn) {
+                if (rows.length > 1) deleteBtn.classList.add('visible');
+                else deleteBtn.classList.remove('visible');
+            }
+        }
+
+        function addMemberRow() {
+            const tbody = document.getElementById('memberTableBody');
+            const firstRow = tbody.querySelector('.member-row'); // Luôn lấy dòng mẫu đầu tiên
+            if (!firstRow) return;
+
+            // 1. Clone dòng
+            const newRow = firstRow.cloneNode(true);
+
+            // 2. Reset Textarea (FIX LỖI CHIỀU CAO)
+            const textareas = newRow.querySelectorAll('textarea');
+            textareas.forEach(t => {
+                t.value = '';
+
+                // Xóa style height để reset về state ban đầu
+                t.style.height = '';
+
+                // Đặt explicit height cho STT textarea (readonly)
+                if (t.hasAttribute('readonly')) {
+                    t.style.height = '28px';
+                    t.style.minHeight = '28px';
+                } else {
+                    // Với các textarea khác: reset height và gọi autoResize nếu có hàm
+                    t.style.height = '';
+                    // Kích hoạt autoResize sau khi append vào DOM
+                    if (t.classList.contains('auto-expand') && typeof autoResize === 'function') {
+                        // Sẽ gọi sau khi appendChild
+                    }
+                }
+            });
+
+            // 3. Thêm dòng mới vào bảng
+            tbody.appendChild(newRow);
+
+            // 4. Gọi autoResize cho tất cả textarea auto-expand trong dòng mới
+            const newTextareas = newRow.querySelectorAll('textarea.auto-expand');
+            newTextareas.forEach(t => {
+                if (typeof autoResize === 'function') {
+                    autoResize(t);
+                }
+            });
+
+            // 5. Cập nhật STT
+            updateMemberSTT();
+        }
+
+        function deleteMemberRow() {
+            const tbody = document.getElementById('memberTableBody');
+            const memberRows = tbody.querySelectorAll('.member-row');
+
+            if (memberRows.length > 1) {
+                tbody.removeChild(tbody.lastElementChild);
+                updateMemberSTT();
+            } else {
+                alert('Phải giữ lại ít nhất 1 dòng thành viên.');
+            }
+        }
+    </script>
+
+</body>
+
+</html>
