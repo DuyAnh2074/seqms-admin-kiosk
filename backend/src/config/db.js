@@ -14,12 +14,12 @@ const sequelize = new Sequelize(
             freezeTableName: true,
             underscored: true,
         },
-        // dialectOptions: {
-        //     ssl: {
-        //         require: true,
-        //         rejectUnauthorized: false,
-        //     },
-        // },
+        dialectOptions: {
+            ssl: {
+                require: true,
+                rejectUnauthorized: false,
+            },
+        },
     }
 );
 
