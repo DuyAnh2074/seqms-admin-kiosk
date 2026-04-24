@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, LogIn, AlertCircle, Mail, Lock } from 'lucide-react';
 import { Button } from '../components/UIComponents';
+import { API_BASE_URL } from '../services/api';
 
 interface LoginProps {
     onLoginSuccess: (username: string, role: string, token: string) => void;
@@ -16,8 +17,6 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [apiError, setApiError] = useState('');
     const [cardVisible, setCardVisible] = useState(false);
-
-    const API_BASE_URL = 'http://localhost:5000/api';
 
     const clearStaffCounterCache = () => {
         localStorage.removeItem('counterSessionToken');

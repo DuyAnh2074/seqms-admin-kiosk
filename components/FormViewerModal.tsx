@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { X, Loader, ArrowLeft, Printer, CheckCircle, XCircle } from 'lucide-react';
 import { Button, Card } from './UIComponents';
+import { API_BASE_URL } from '../services/api';
 
 interface FormViewerModalProps {
     isOpen: boolean;
@@ -78,8 +79,12 @@ const formatDateToDDMMYYYY = (dateStr: string | undefined): string => {
 };
 
 // Map ID data to customer data format
-const mapIdDataToCustomerData = (idData, serviceKey = null) => {
+const mapIdDataToCustomerData = (
+    idData: Record<string, any> | null | undefined,
+    serviceKey: string | null = null
+): Record<string, string> => {
     if (!idData) return {};
+    void serviceKey;
     let placeOfIssue = idData.place_of_issue || "";
     if (!placeOfIssue) {
         if (idData.place_of_residence_qr) {
@@ -93,7 +98,7 @@ const mapIdDataToCustomerData = (idData, serviceKey = null) => {
 
     const currentDate = getCurrentDateForTemplate();
 
-    const parsedAddr = idData.parsed_data?.place_of_residence || idData.parsed_data?.place_of_residence_qr || {};
+    const parsedAddr = (idData.parsed_data?.place_of_residence || idData.parsed_data?.place_of_residence_qr || {}) as Record<string, string>;
 
     // Extract address components from parsed data
     let province = parsedAddr.province || "";
@@ -105,7 +110,7 @@ const mapIdDataToCustomerData = (idData, serviceKey = null) => {
     // ✅ FIX: Kiểm tra cả place_of_residence và place_of_residence_qr
     if (!province && (idData.place_of_residence || idData.place_of_residence_qr)) {
         const addressStr = idData.place_of_residence || idData.place_of_residence_qr;
-        const parts = addressStr.split(',').map(p => p.trim());
+        const parts = addressStr.split(',').map((p: string) => p.trim());
         const len = parts.length;
         if (len > 0) province = parts[len - 1];
         if (len > 1) district = parts[len - 2];
@@ -199,14 +204,15 @@ const FormViewerModal: React.FC<FormViewerModalProps> = ({
         // ✅ Note: transformedData already includes current_day, current_month, current_year
         if (transformedData) {
             Object.keys(transformedData).forEach((key) => {
+                const value = transformedData[key];
                 // ✅ FIX: Cho phép empty strings để truyền cả các field rỗng
-                if (key !== 'avatar' && transformedData[key] !== undefined && transformedData[key] !== null) {
-                    queryParams.append(key, transformedData[key]);
+                if (key !== 'avatar' && value !== undefined && value !== null) {
+                    queryParams.append(key, String(value));
                 }
             });
         }
 
-        const baseUrl = 'http://localhost:5000/api/public/html-forms';
+        const baseUrl = `${API_BASE_URL}/public/html-forms`;
         const url = `${baseUrl}/${templateName}?${queryParams.toString()}`;
         console.log('🌐 HTML Form URL:', url);
         return url;
@@ -258,7 +264,7 @@ const FormViewerModal: React.FC<FormViewerModalProps> = ({
     const handleGeneratePDF = async (formData: any) => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/api/pdf/generate-pdf-from-html', {
+            const response = await fetch(`${API_BASE_URL}/pdf/generate-pdf-from-html`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -297,7 +303,7 @@ const FormViewerModal: React.FC<FormViewerModalProps> = ({
 
             console.log('📄 Printing PDF file:', fileName);
 
-            const response = await fetch('http://localhost:5000/api/pdf/convert-html-to-pdf', {
+            const response = await fetch(`${API_BASE_URL}/pdf/convert-html-to-pdf`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

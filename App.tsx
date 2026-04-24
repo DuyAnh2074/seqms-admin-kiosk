@@ -15,7 +15,7 @@ import BoardDisplayPage from './pages/BoardDisplayPage';
 import PrivateRoute from './components/PrivateRoute';
 import Sidebar from './components/Sidebar';
 import { Modal } from './components/UIComponents';
-import api from './services/api';
+import api, { API_BASE_URL } from './services/api';
 
 const Header = ({ onMenuClick, username, userRole, onLogoutClick, hasActiveServing, onOpenTvPicker }: { onMenuClick: () => void, username: string, userRole: string, onLogoutClick: () => void, hasActiveServing?: boolean, onOpenTvPicker: () => void }) => (
   <header className="h-16 bg-white shadow-sm flex items-center justify-between px-6 sticky top-0 z-10">
@@ -308,7 +308,7 @@ const App: React.FC = () => {
     // If user is staff, end their counter session
     if (userRole === 'staff' && authToken) {
       try {
-        await fetch('http://localhost:5000/api/staff/session/end', {
+        await fetch(`${API_BASE_URL}/staff/session/end`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${authToken}`,
@@ -357,7 +357,7 @@ const App: React.FC = () => {
         const counterSessionToken = localStorage.getItem('counterSessionToken');
         if (counterSessionToken) {
           try {
-            await fetch('http://localhost:5000/api/staff/session/end-by-token', {
+            await fetch(`${API_BASE_URL}/staff/session/end-by-token`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -670,7 +670,7 @@ const RoleRedirector: React.FC<{ userRole: string }> = ({ userRole }) => {
 
       try {
         // Try to restore session
-        const response = await fetch('http://localhost:5000/api/staff/session/restore', {
+        const response = await fetch(`${API_BASE_URL}/staff/session/restore`, {
           headers: {
             'Authorization': `Bearer ${authToken}`,
             'x-counter-session-token': sessionToken,

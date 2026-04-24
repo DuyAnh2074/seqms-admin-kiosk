@@ -4,7 +4,9 @@ import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig, AxiosResp
  * Base API URL Configuration
  * Có thể đổi thành environment variable: import.meta.env.VITE_API_BASE_URL
  */
-const API_BASE_URL = 'http://localhost:5000/api';
+const rawApiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:10000/api';
+const API_BASE_URL = rawApiBaseUrl.replace(/\/+$/, '');
+const SOCKET_URL = (import.meta.env.VITE_SOCKET_URL || API_BASE_URL.replace(/\/api$/, '')).replace(/\/+$/, '');
 
 /**
  * Create Axios Instance với cấu hình mặc định
@@ -90,3 +92,4 @@ export default api;
  * Export BASE_URL cho các trường hợp đặc biệt cần dùng
  */
 export { API_BASE_URL };
+export { SOCKET_URL };

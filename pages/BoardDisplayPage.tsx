@@ -4,7 +4,7 @@ import TicketCallPopup from '../components/TicketCallPopup';
 import HeaderBoard from '../components/HeaderBoard';
 import MediaContainer from '../components/MediaContainer';
 import { io, Socket } from 'socket.io-client';
-import api from '../services/api';
+import api, { SOCKET_URL } from '../services/api';
 import { Bell, MoveRight, PlayCircle } from 'lucide-react';
 
 interface EBoardConfig {
@@ -148,7 +148,7 @@ const BoardDisplayPage: React.FC = () => {
     const setupSocketConnection = () => {
         if (!config) return;
 
-        socketRef.current = io('http://localhost:5000', {
+        socketRef.current = io(SOCKET_URL, {
             transports: ['websocket'],
         });
 

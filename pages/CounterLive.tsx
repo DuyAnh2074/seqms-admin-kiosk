@@ -24,7 +24,7 @@ import CancelTicketModal from '../components/CancelTicketModal';
 import AddServiceModal from '../components/AddServiceModal';
 import FormViewerModal from '../components/FormViewerModal';
 import useTextToSpeech from '../hooks/useTextToSpeech';
-import api from '../services/api';
+import api, { SOCKET_URL } from '../services/api';
 
 
 // Types
@@ -342,7 +342,7 @@ const CounterLive: React.FC = () => {
         }
 
         // Connect to Socket.IO server
-        const socket = io('http://localhost:5000', {
+        const socket = io(SOCKET_URL, {
             transports: ['websocket', 'polling'],
             reconnection: true,
             reconnectionDelay: 1000,

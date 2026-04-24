@@ -10,7 +10,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: '*', // Cho phép tất cả (Dễ nhất để test LAN)
+    origin: '*',
     credentials: true
 }));
 app.use(express.json({ limit: '50mb' })); // Increase limit for base64 images

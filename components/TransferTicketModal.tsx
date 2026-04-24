@@ -33,8 +33,6 @@ interface TransferTicketModalProps {
     allowedServiceIds?: number[];
 }
 
-const API_BASE = 'http://localhost:5000/api';
-
 const TransferTicketModal: React.FC<TransferTicketModalProps> = ({
     isOpen,
     ticketNumber,
@@ -362,7 +360,7 @@ const TransferTicketModal: React.FC<TransferTicketModalProps> = ({
                         <Button
                             variant="primary"
                             onClick={handleConfirm}
-                            disabled={loading || (!selectedCounterId && !selectedServiceId) || (selectedServiceId && !selectedCounterId)}
+                            disabled={loading || (!selectedCounterId && !selectedServiceId) || (!!selectedServiceId && !selectedCounterId)}
                             className="bg-blue-600 hover:bg-blue-700"
                         >
                             {loading ? 'Đang xử lý...' : 'Xác nhận'}

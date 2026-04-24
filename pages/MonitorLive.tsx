@@ -3,7 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import { Users, Clock, CheckCircle, XCircle, Activity, Calendar, Building2 } from 'lucide-react';
 import { Card } from '../components/UIComponents';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import api from '../services/api';
+import api, { SOCKET_URL } from '../services/api';
 
 // Types
 interface Stats {
@@ -284,7 +284,7 @@ const MonitorLive: React.FC = () => {
 
     // Setup Socket.IO
     useEffect(() => {
-        const socket = io('http://localhost:5000', {
+        const socket = io(SOCKET_URL, {
             transports: ['websocket', 'polling'],
             reconnection: true,
         });
