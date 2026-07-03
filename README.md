@@ -2,7 +2,7 @@
 
 Tài liệu này cung cấp hướng dẫn chi tiết để chạy dự án **SEQMS Admin Kiosk** gồm frontend (React + Vite) và backend (Node.js + Express + NeonDB).
 
-https://seqms-admin-kiosk.vercel.app/#/
+https://seqms-admin-kiosk.vercel.app
 
 **Admin mặc định:**
 - Username: `admin`
