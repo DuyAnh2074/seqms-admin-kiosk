@@ -1,6 +1,6 @@
 require('dotenv').config();
 const app = require('./app');
-const { connectPostgres } = require('./config/db');
+const { connectPostgres, pingDatabase } = require('./config/db');
 const { createServer } = require('http');
 const { initializeSocketIO } = require('./socket');
 
@@ -10,6 +10,9 @@ const startServer = async () => {
     try {
         // Connect to PostgreSQL
         await connectPostgres();
+
+        const keepAliveInterval = setInterval(pingDatabase, 4 * 60 * 1000);
+        keepAliveInterval.unref();
 
         // Create HTTP server
         const httpServer = createServer(app);

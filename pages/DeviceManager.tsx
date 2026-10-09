@@ -211,6 +211,19 @@ const DeviceManager: React.FC = () => {
     return `${day}/${month}/${year}`;
   };
 
+  const toValidNumber = (value: unknown): number | '' => {
+    if (value === '' || value === null || value === undefined) {
+      return '';
+    }
+
+    const num = Number(value);
+    return Number.isFinite(num) ? num : '';
+  };
+
+  const isValidNumber = (value: unknown): value is number => (
+    typeof value === 'number' && Number.isFinite(value)
+  );
+
   // Cleanup uploaded temp files when component unmounts or when cancel form
   const cleanupUploadedFiles = async () => {
     if (uploadedTempFiles.length === 0) {
@@ -268,8 +281,8 @@ const DeviceManager: React.FC = () => {
 
   // Load districts when province changes
   useEffect(() => {
-    if (selectedProvince) {
-      loadDistricts(selectedProvince as number);
+    if (isValidNumber(selectedProvince)) {
+      loadDistricts(selectedProvince);
     } else {
       setDistricts([]);
       setSelectedDistrict('');
@@ -280,8 +293,8 @@ const DeviceManager: React.FC = () => {
 
   // Load offices when district changes
   useEffect(() => {
-    if (selectedDistrict) {
-      loadOffices(selectedDistrict as number);
+    if (isValidNumber(selectedDistrict)) {
+      loadOffices(selectedDistrict);
     } else {
       setOffices([]);
       setSelectedOffice('');
@@ -290,7 +303,11 @@ const DeviceManager: React.FC = () => {
 
   // Load services and service groups when office selected
   useEffect(() => {
-    if (selectedOffice) {
+    if (activeTab !== 'Kiosk' && activeTab !== 'Counter') {
+      return;
+    }
+
+    if (isValidNumber(selectedOffice)) {
       loadServicesAndServiceGroups();
     } else {
       setServices([]);
@@ -298,7 +315,7 @@ const DeviceManager: React.FC = () => {
       setFormData(prev => ({ ...prev, service_group_ids: [] }));
       setSelectedServiceIds([]);
     }
-  }, [selectedOffice]);
+  }, [selectedOffice, activeTab]);
 
   const loadProvinces = async () => {
     try {
@@ -310,6 +327,10 @@ const DeviceManager: React.FC = () => {
   };
 
   const loadDistricts = async (provinceId: number) => {
+    if (!Number.isFinite(provinceId)) {
+      return;
+    }
+
     try {
       const response = await api.get('/districts', {
         params: { province_id: provinceId }
@@ -321,6 +342,10 @@ const DeviceManager: React.FC = () => {
   };
 
   const loadOffices = async (districtId: number, activeOnly: boolean = true) => {
+    if (!Number.isFinite(districtId)) {
+      return;
+    }
+
     try {
       const response = await api.get('/transaction-offices', {
         params: {
@@ -335,10 +360,15 @@ const DeviceManager: React.FC = () => {
   };
 
   const loadServicesAndServiceGroups = async () => {
+    if (!isValidNumber(selectedOffice)) {
+      return;
+    }
+
     try {
+      const officeId = selectedOffice;
       const [servicesRes, groupsRes] = await Promise.all([
-        api.get('/services', { params: { transaction_office_id: selectedOffice } }),
-        api.get('/service-groups', { params: { transaction_office_id: selectedOffice } }),
+        api.get('/services', { params: { transaction_office_id: officeId } }),
+        api.get('/service-groups', { params: { transaction_office_id: officeId } }),
       ]);
 
       // Sort services: selected ones first, then others
@@ -409,25 +439,18 @@ const DeviceManager: React.FC = () => {
 
   const handleEditClick = async (kiosk: Kiosk) => {
     setEditingId(Number(kiosk.id));
-
-    // Load the full kiosk details to get service_group_ids and service_ids
     try {
-      const response = await api.get('/kiosks');
-      const fullKiosk = response.data.data.find((k: Kiosk) => k.id === kiosk.id);
+      setFormData({
+        transaction_office_id: kiosk.locationId || '',
+        service_group_ids: kiosk.serviceGroupIds || [],
+        name: kiosk.name,
+        code: kiosk.code,
+      });
+      setSelectedServiceIds(kiosk.serviceIds || []);
 
-      if (fullKiosk) {
-        setFormData({
-          transaction_office_id: fullKiosk.locationId || '',
-          service_group_ids: fullKiosk.serviceGroupIds || [],
-          name: fullKiosk.name,
-          code: fullKiosk.code,
-        });
-        setSelectedServiceIds(fullKiosk.serviceIds || []);
-
-        // Load province/district/office hierarchy for the form dropdowns
-        if (fullKiosk.locationId) {
-          await loadHierarchyForOffice(fullKiosk.locationId);
-        }
+      // Load province/district/office hierarchy for the form dropdowns
+      if (kiosk.locationId) {
+        await loadHierarchyForOffice(kiosk.locationId);
       }
     } catch (err) {
       console.error('Error loading kiosk details:', err);
@@ -440,47 +463,19 @@ const DeviceManager: React.FC = () => {
   // Load province -> district -> office hierarchy when editing
   const loadHierarchyForOffice = async (officeId: number) => {
     try {
-      const officeRes = await api.get('/transaction-offices');
-      const office = officeRes.data.data.find((o: TransactionOffice) => o.id === officeId);
+      const officeRes = await api.get(`/transaction-offices/${officeId}`);
+      const office = officeRes.data?.data;
+      const provinceId = toValidNumber(office?.province_id);
+      const districtId = toValidNumber(office?.district_id);
 
-      if (office && office.district_id) {
-        const districtRes = await api.get('/districts');
-        const district = districtRes.data.data.find((d: District) => d.id === office.district_id);
-
-        if (district && district.province_id) {
-          setSelectedProvince(district.province_id);
-          await loadDistricts(district.province_id);
-          setSelectedDistrict(office.district_id);
-          await loadOffices(office.district_id, false);
-          setSelectedOffice(officeId);
-          await loadServicesAndServiceGroupsForOffice(officeId);
-        }
+      if (provinceId !== '' && districtId !== '') {
+        // Set hierarchy states; existing useEffects will fetch districts/offices/services.
+        setSelectedProvince(provinceId);
+        setSelectedDistrict(districtId);
+        setSelectedOffice(officeId);
       }
     } catch (err) {
       console.error('Error loading hierarchy:', err);
-    }
-  };
-
-  // Helper function to load services and service groups for a specific office
-  const loadServicesAndServiceGroupsForOffice = async (officeId: number) => {
-    try {
-      const [servicesRes, groupsRes] = await Promise.all([
-        api.get('/services', { params: { transaction_office_id: officeId } }),
-        api.get('/service-groups', { params: { transaction_office_id: officeId } }),
-      ]);
-
-      // Sort services: selected ones first, then others
-      const allServices = servicesRes.data.data || [];
-      const sortedServices = allServices.sort((a: Service, b: Service) => {
-        const aSelected = selectedServiceIds.includes(Number(a.id)) ? 0 : 1;
-        const bSelected = selectedServiceIds.includes(Number(b.id)) ? 0 : 1;
-        return aSelected - bSelected;
-      });
-
-      setServices(sortedServices);
-      setServiceGroups(groupsRes.data.data || []);
-    } catch (err) {
-      console.error('Error loading services/groups:', err);
     }
   };
 
@@ -634,6 +629,11 @@ const DeviceManager: React.FC = () => {
   };
 
   const loadEBoardCounters = async (officeId: number) => {
+    if (!Number.isFinite(officeId)) {
+      setEBoardCounters([]);
+      return [];
+    }
+
     try {
       const response = await api.get('/counters', {
         params: {
@@ -641,9 +641,13 @@ const DeviceManager: React.FC = () => {
           active_only: true,
         }
       });
-      setEBoardCounters(response.data.data || []);
+      const activeCounters = response.data.data || [];
+      setEBoardCounters(activeCounters);
+      return activeCounters;
     } catch (err) {
       console.error('Error loading eboard counters:', err);
+      setEBoardCounters([]);
+      return [];
     }
   };
 
@@ -671,6 +675,7 @@ const DeviceManager: React.FC = () => {
       setIsLoading(true);
       const response = await api.get(`/eboards/${eboard.id}`);
       const latestEBoard = response.data.data;
+      const selectedCounterIds = latestEBoard.counters?.map((c: any) => c.id) || [];
 
       setEditingId(latestEBoard.id);
       setEBoardFormData({
@@ -679,7 +684,7 @@ const DeviceManager: React.FC = () => {
         name: latestEBoard.name,
         display_video: latestEBoard.display_video,
         voice_call_number: latestEBoard.voice_call_number || 'north',
-        counter_ids: latestEBoard.counters?.map((c: any) => c.id) || [],
+        counter_ids: selectedCounterIds,
         media: latestEBoard.EBoardMedia?.map((m: any) => ({
           id: m.id,
           file_type: m.file_type,
@@ -689,27 +694,22 @@ const DeviceManager: React.FC = () => {
         })) || [],
       });
 
-      if (latestEBoard.transaction_office_id) {
-        await loadHierarchyForOffice(latestEBoard.transaction_office_id);
-        const countersRes = await api.get('/counters', {
-          params: {
-            office_id: latestEBoard.transaction_office_id,
-            active_only: true,
-          }
-        });
+      // Show edit form first, then hydrate dependent dropdown data.
+      setEBoardFormTab('general');
+      setViewMode('edit');
 
-        const activeCounters = countersRes.data.data || [];
+      if (latestEBoard.transaction_office_id) {
+        const [activeCounters] = await Promise.all([
+          loadEBoardCounters(latestEBoard.transaction_office_id),
+          loadHierarchyForOffice(latestEBoard.transaction_office_id),
+        ]);
         const activeCounterIds = new Set(activeCounters.map((c: any) => Number(c.id)));
 
-        setEBoardCounters(activeCounters);
         setEBoardFormData(prev => ({
           ...prev,
           counter_ids: prev.counter_ids.filter(counterId => activeCounterIds.has(Number(counterId))),
         }));
       }
-
-      setEBoardFormTab('general');
-      setViewMode('edit');
     } catch (err) {
       showToast('Lỗi khi tải E-Board', 'error');
       console.error(err);
@@ -796,15 +796,18 @@ const DeviceManager: React.FC = () => {
 
   const handleEBoardFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
+    const parsedOfficeId = name === 'transaction_office_id' ? toValidNumber(value) : value;
     setEBoardFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : parsedOfficeId,
     }));
 
     // Load counters when office changes
-    if (name === 'transaction_office_id' && value) {
-      loadEBoardCounters(Number(value));
+    if (name === 'transaction_office_id' && parsedOfficeId !== '') {
+      loadEBoardCounters(parsedOfficeId as number);
       setEBoardFormData(prev => ({ ...prev, counter_ids: [] }));
+    } else if (name === 'transaction_office_id') {
+      setEBoardCounters([]);
     }
   };
 
@@ -1276,7 +1279,7 @@ const DeviceManager: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">Tỉnh/Thành phố *</label>
             <select
               value={selectedProvince}
-              onChange={(e) => setSelectedProvince(e.target.value ? Number(e.target.value) : '')}
+              onChange={(e) => setSelectedProvince(toValidNumber(e.target.value))}
               className="w-full border border-gray-300 rounded-md py-2.5 px-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">-- Chọn Tỉnh/Thành phố --</option>
@@ -1291,7 +1294,7 @@ const DeviceManager: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">Xã/Phường *</label>
             <select
               value={selectedDistrict}
-              onChange={(e) => setSelectedDistrict(e.target.value ? Number(e.target.value) : '')}
+              onChange={(e) => setSelectedDistrict(toValidNumber(e.target.value))}
               disabled={!selectedProvince}
               className="w-full border border-gray-300 rounded-md py-2.5 px-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
             >
@@ -1308,7 +1311,7 @@ const DeviceManager: React.FC = () => {
             <select
               value={selectedOffice}
               onChange={(e) => {
-                const officeId = e.target.value ? Number(e.target.value) : '';
+                const officeId = toValidNumber(e.target.value);
                 setSelectedOffice(officeId);
                 setFormData(prev => ({
                   ...prev,
@@ -1609,7 +1612,7 @@ const DeviceManager: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">Tỉnh/Thành phố *</label>
             <select
               value={selectedProvince}
-              onChange={(e) => setSelectedProvince(e.target.value ? Number(e.target.value) : '')}
+              onChange={(e) => setSelectedProvince(toValidNumber(e.target.value))}
               className="w-full border border-gray-300 rounded-md py-2.5 px-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">-- Chọn Tỉnh/Thành phố --</option>
@@ -1624,7 +1627,7 @@ const DeviceManager: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">Xã/Phường *</label>
             <select
               value={selectedDistrict}
-              onChange={(e) => setSelectedDistrict(e.target.value ? Number(e.target.value) : '')}
+              onChange={(e) => setSelectedDistrict(toValidNumber(e.target.value))}
               disabled={!selectedProvince}
               className="w-full border border-gray-300 rounded-md py-2.5 px-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
             >
@@ -1641,11 +1644,11 @@ const DeviceManager: React.FC = () => {
             <select
               value={selectedOffice}
               onChange={(e) => {
-                const officeId = e.target.value ? Number(e.target.value) : '';
+                const officeId = toValidNumber(e.target.value);
                 setSelectedOffice(officeId);
                 setCounterFormData(prev => ({
                   ...prev,
-                  transaction_office_id: Number(officeId),
+                  transaction_office_id: officeId,
                 }));
               }}
               disabled={!selectedDistrict}
@@ -1925,7 +1928,7 @@ const DeviceManager: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">Tỉnh/Thành phố *</label>
               <select
                 value={selectedProvince}
-                onChange={(e) => setSelectedProvince(e.target.value ? Number(e.target.value) : '')}
+                onChange={(e) => setSelectedProvince(toValidNumber(e.target.value))}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">-- Chọn Tỉnh/TP --</option>
@@ -1939,7 +1942,7 @@ const DeviceManager: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">Xã/Phường *</label>
               <select
                 value={selectedDistrict}
-                onChange={(e) => setSelectedDistrict(e.target.value ? Number(e.target.value) : '')}
+                onChange={(e) => setSelectedDistrict(toValidNumber(e.target.value))}
                 disabled={!selectedProvince}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
               >
@@ -1985,7 +1988,7 @@ const DeviceManager: React.FC = () => {
                         onChange={() => handleEBoardCounterToggle(counter.id)}
                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                       />
-                      <span className="text-sm">{counter.name} ({counter.code})</span>
+                      <span className="text-sm">{counter.name}</span>
                     </label>
                   ))}
                 </div>

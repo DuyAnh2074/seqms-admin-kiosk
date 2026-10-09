@@ -10,6 +10,13 @@ const sequelize = new Sequelize(
         port: process.env.DB_PORT || 5432,
         dialect: 'postgres',
         logging: false,
+        pool: {
+            max: 10,
+            min: 2,
+            acquire: 30000,
+            idle: 30000,
+            evict: 15000,
+        },
         define: {
             freezeTableName: true,
             underscored: true,
@@ -19,6 +26,8 @@ const sequelize = new Sequelize(
                 require: true,
                 rejectUnauthorized: false,
             },
+            keepAlive: true,
+            statement_timeout: 30000,
         },
     }
 );
@@ -35,9 +44,13 @@ const connectPostgres = async () => {
         const { initializeAssociations } = require('../models/init-models');
         initializeAssociations();
 
-        // Sync all models with database (force: false để không xóa dữ liệu)
-        await sequelize.sync({ force: false });
-        console.log('✅ Database models synced');
+        if (process.env.NODE_ENV !== 'production') {
+            // Sync models only during development; production uses migrations.
+            await sequelize.sync({ force: false });
+            console.log('✅ Database models synced');
+        } else {
+            console.log('ℹ️ Skipping database sync in production');
+        }
 
         return true;
     } catch (error) {
@@ -47,4 +60,13 @@ const connectPostgres = async () => {
     }
 };
 
-module.exports = { Sequelize, sequelize, connectPostgres, Op };
+const pingDatabase = async () => {
+    try {
+        await sequelize.query('SELECT 1');
+        console.log('✅ Database keep-alive ping succeeded');
+    } catch (error) {
+        console.error('❌ Database keep-alive ping failed:', error.message);
+    }
+};
+
+module.exports = { Sequelize, sequelize, connectPostgres, pingDatabase, Op };

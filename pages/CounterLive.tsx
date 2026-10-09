@@ -196,6 +196,8 @@ const CounterLive: React.FC = () => {
 
     // Socket reference
     const socketRef = useRef<Socket | null>(null);
+    const queueFetchInFlightRef = useRef(false);
+    const queueRefreshTimerRef = useRef<number | null>(null);
 
     // Initialize text-to-speech hook
     const { speak } = useTextToSpeech();
@@ -260,12 +262,18 @@ const CounterLive: React.FC = () => {
         queueData.currentTicket?.started_at ? new Date(queueData.currentTicket.started_at) : null
     );
 
-    // Fetch queue data (only called once on mount, then updated via socket)
+    // Fetch queue data (socket updates and action sync)
     const fetchQueueData = useCallback(async () => {
         if (!sessionToken) {
             setError('No session token found');
             return;
         }
+
+        if (queueFetchInFlightRef.current) {
+            return;
+        }
+
+        queueFetchInFlightRef.current = true;
 
         try {
             // Fetch queue data
@@ -294,17 +302,6 @@ const CounterLive: React.FC = () => {
             } else {
                 setError(response.data.message || 'Failed to fetch queue data');
             }
-
-            // Fetch counter info for voice announcement
-            const sessionResponse = await api.get('/counter-live/session-info', {
-                headers: {
-                    'x-session-token': sessionToken,
-                },
-            });
-
-            if (sessionResponse.data.success && sessionResponse.data.data?.counter) {
-                setCounterName(sessionResponse.data.data.counter.name || 'Quầy ');
-            }
         } catch (err: any) {
             console.error('Fetch queue error:', err);
             const message = err.response?.data?.message || err.message || 'Network error';
@@ -317,8 +314,42 @@ const CounterLive: React.FC = () => {
             if (err.response?.status === 401 || err.response?.status === 403) {
                 return; // Interceptor will handle logout
             }
+        } finally {
+            queueFetchInFlightRef.current = false;
         }
     }, [sessionToken, handleCounterDeactivated]);
+
+    const fetchSessionInfo = useCallback(async () => {
+        if (!sessionToken) return;
+
+        try {
+            const sessionResponse = await api.get('/counter-live/session-info', {
+                headers: {
+                    'x-session-token': sessionToken,
+                },
+            });
+
+            if (sessionResponse.data.success && sessionResponse.data.data?.counter) {
+                setCounterName(sessionResponse.data.data.counter.name || 'Quầy ');
+            }
+        } catch (err: any) {
+            const message = err.response?.data?.message || err.message;
+            if (isSessionInvalidMessage(message)) {
+                handleCounterDeactivated('Quầy của bạn đã bị vô hiệu hóa hoặc phiên làm việc đã hết hiệu lực.');
+            }
+        }
+    }, [sessionToken, handleCounterDeactivated]);
+
+    const scheduleQueueRefresh = useCallback((delayMs = 120) => {
+        if (queueRefreshTimerRef.current !== null) {
+            window.clearTimeout(queueRefreshTimerRef.current);
+        }
+
+        queueRefreshTimerRef.current = window.setTimeout(() => {
+            queueRefreshTimerRef.current = null;
+            fetchQueueData();
+        }, delayMs);
+    }, [fetchQueueData]);
 
     // Notify App component when serving status changes (for logout prevention)
     useEffect(() => {
@@ -362,8 +393,9 @@ const CounterLive: React.FC = () => {
 
         socket.on('joined-successfully', (data) => {
             console.log('✅ Joined counter session:', data);
-            // Fetch initial data
+            // Fetch initial queue and counter profile
             fetchQueueData();
+            fetchSessionInfo();
         });
 
         socket.on('disconnect', () => {
@@ -387,27 +419,30 @@ const CounterLive: React.FC = () => {
         });
 
         // Listen for queue updates
-        // Always refetch on queue update; add small delay to let DB commit
+        // Debounce queue refresh to avoid duplicate heavy refetches when many events arrive together.
         socket.on('queue-updated', () => {
             console.log('📥 Queue updated: refetching queue data');
-            setTimeout(() => {
-                fetchQueueData();
-            }, 150);
+            scheduleQueueRefresh(150);
         });
 
         socket.on('CONFIG_UPDATED', () => {
             console.log('🔄 Counter config updated: refetching queue data');
-            fetchQueueData();
+            scheduleQueueRefresh(120);
         });
 
         // Cleanup on unmount
         return () => {
             console.log('🔌 Disconnecting socket...');
             socket.off('counter-force-logout');
+            socket.off('queue-updated');
             socket.off('CONFIG_UPDATED');
             socket.disconnect();
+            if (queueRefreshTimerRef.current !== null) {
+                window.clearTimeout(queueRefreshTimerRef.current);
+                queueRefreshTimerRef.current = null;
+            }
         };
-    }, [sessionToken, fetchQueueData, handleCounterDeactivated]);
+    }, [sessionToken, fetchQueueData, fetchSessionInfo, handleCounterDeactivated, scheduleQueueRefresh]);
 
     // Call Next Ticket
     const handleCallNext = async () => {
@@ -427,7 +462,19 @@ const CounterLive: React.FC = () => {
                 if (response.data.data?.ticket_number) {
                     speak(response.data.data.ticket_number, counterName);
                 }
-                await fetchQueueData();
+
+                // Optimistic update for instant UI feedback; then background sync.
+                if (response.data.data) {
+                    const calledTicket = response.data.data as Ticket;
+                    setQueueData(prev => ({
+                        ...prev,
+                        currentTicket: calledTicket,
+                        waiting: prev.waiting.filter(t => t.id !== calledTicket.id),
+                        missed: prev.missed.filter(t => t.id !== calledTicket.id),
+                    }));
+                }
+
+                scheduleQueueRefresh(80);
             } else {
                 showToast(response.data.message || 'Không thể gọi vé', 'error');
             }
@@ -460,7 +507,18 @@ const CounterLive: React.FC = () => {
                 if (response.data.data?.ticket_number) {
                     speak(response.data.data.ticket_number, counterName);
                 }
-                await fetchQueueData();
+
+                if (response.data.data) {
+                    const calledTicket = response.data.data as Ticket;
+                    setQueueData(prev => ({
+                        ...prev,
+                        currentTicket: calledTicket,
+                        waiting: prev.waiting.filter(t => t.id !== calledTicket.id),
+                        missed: prev.missed.filter(t => t.id !== calledTicket.id),
+                    }));
+                }
+
+                scheduleQueueRefresh(80);
             } else {
                 showToast(response.data.message || 'Không thể gọi vé', 'error');
             }

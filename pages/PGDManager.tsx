@@ -177,8 +177,12 @@ const PGDManager: React.FC = () => {
       fetchTransactionOffices();
     } else if (activeTab === 'Cấu hình') {
       fetchOfficeConfigs(); // Load config list
-      fetchServiceGroups(); // ✅ Load service groups for configuration
-      //fetchTransactionOffices(); // For office selection
+      if (offices.length === 0) {
+        fetchTransactionOffices();
+      }
+      if (provinces.length === 0) {
+        fetchProvinces();
+      }
     }
   }, [activeTab]);
 
@@ -658,13 +662,6 @@ const PGDManager: React.FC = () => {
     }
   };
 
-  /**
-   * Xử lý chỉnh sửa cấu hình với quy trình tải dữ liệu tuần tự
-   * 1. Ensure offices list loaded
-   * 2. Fetch districts by province
-   * 3. Set form data
-   * 4. Switch to configure view
-   */
   const handleEditConfigurationAsync = async (config: any) => {
     if (config?.is_active === false) {
       showToast('PGD đang bị vô hiệu hóa', 'error');
@@ -672,47 +669,32 @@ const PGDManager: React.FC = () => {
     }
 
     try {
-      const provinceId = config.province_id;
-      const districtId = config.district_id;
-      const officeId = config.id;
+      const provinceId = Number(config.province_id) || 0;
+      const districtId = Number(config.district_id) || 0;
+      const officeId = Number(config.id);
 
-      // Step 1: Ensure offices list is loaded
-      let officesList = offices;
-      if (officesList.length === 0) {
-        try {
-          const response = await api.get('/transaction-offices');
-          officesList = response.data.data || [];
-          setOffices(officesList);
-        } catch (error) {
-          console.error('Error fetching offices:', error);
-        }
-      }
-
-      // Step 2: Fetch districts for the selected province
-      if (provinceId) {
-        try {
-          setLoadingCascadingDistricts(true);
-          const response = await api.get(`/transaction-offices/districts/by-province/${provinceId}`);
-          const sortedData = (response.data.data || []).sort((a: any, b: any) => a.id - b.id);
-          setDistrictsByProvince(sortedData);
-        } catch (error) {
-          console.error('Error fetching districts:', error);
-        } finally {
-          setLoadingCascadingDistricts(false);
-        }
-      }
-
-      // Step 3: Set form data with all required values
+      // Open configure UI first, then hydrate dependent dropdown data in background.
       setIsEditingConfig(true);
       setConfigForm({
-        province_id: String(provinceId || ''),
-        district_id: String(districtId || ''),
+        province_id: provinceId ? String(provinceId) : '',
+        district_id: districtId ? String(districtId) : '',
         office_id: String(officeId),
       });
-
-      // Step 4: Switch to configure view mode
       setServiceSearchKeyword('');
+      setGroupSearchKeyword('');
       setViewMode('configure');
+
+      const preloadTasks: Promise<any>[] = [];
+      if (offices.length === 0) {
+        preloadTasks.push(fetchTransactionOffices());
+      }
+      if (provinceId) {
+        preloadTasks.push(fetchDistrictsByProvince(provinceId));
+      }
+
+      if (preloadTasks.length > 0) {
+        await Promise.all(preloadTasks);
+      }
     } catch (error) {
       console.error('Error in edit configuration:', error);
       showToast('Lỗi khi chuẩn bị biểu mẫu chỉnh sửa', 'error');
